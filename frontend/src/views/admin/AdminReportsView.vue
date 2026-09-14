@@ -26,7 +26,7 @@ const maxOrderedQuantity = () => Math.max(1, ...mostOrderedItems.value.map((i) =
 
     <div v-else class="space-y-10">
       <!-- Headline stat tile -->
-      <div class="border border-border p-5">
+      <div class="hud-corners border border-border p-5">
         <p class="text-sm text-muted mb-1">Total confirmed bookings</p>
         <p class="text-3xl font-display font-bold uppercase tracking-wide tabular-nums">{{ totalBookings }}</p>
       </div>

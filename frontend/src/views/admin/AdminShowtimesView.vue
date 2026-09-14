@@ -133,7 +133,7 @@ onMounted(load)
         </tr>
       </thead>
       <tbody>
-        <tr v-for="s in showtimes" :key="s.id" class="border-t border-border">
+        <tr v-for="s in showtimes" :key="s.id" class="border-t border-border transition-colors hover:bg-white/[0.02]">
           <td class="py-2">
             <div class="h-14 w-10 overflow-hidden border border-border bg-white/5">
               <img v-if="s.poster_url" :src="s.poster_url" :alt="s.movie_title" class="h-full w-full object-cover" />

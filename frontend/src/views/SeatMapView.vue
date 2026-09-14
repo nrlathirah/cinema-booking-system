@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
 import socket from '../services/socket'
@@ -24,6 +24,13 @@ async function loadSeats() {
   showtime.value = data.showtime
   seats.value = data.seats
 }
+
+const selectedSeatLabels = computed(() =>
+  seats.value
+    .filter((seat) => selected.value.has(seat.id))
+    .map((seat) => `${seat.seat_row}${seat.seat_number}`)
+    .join(' · '),
+)
 
 function seatStatus(seat) {
   if (seat.status === 'taken') return 'taken'
@@ -178,8 +185,13 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="fixed inset-x-0 bottom-0 border-t-2 border-border bg-bg/95 px-6 py-4 backdrop-blur">
-      <div class="mx-auto flex max-w-lg items-center justify-between">
-        <p class="text-xs text-muted">{{ selected.size }} seat{{ selected.size === 1 ? '' : 's' }} selected</p>
+      <div class="mx-auto flex max-w-lg items-center justify-between gap-4">
+        <div class="min-w-0">
+          <p class="text-xs text-muted">{{ selected.size }} seat{{ selected.size === 1 ? '' : 's' }} selected</p>
+          <p v-if="selectedSeatLabels" class="font-display truncate text-sm font-bold text-accent">
+            {{ selectedSeatLabels }}
+          </p>
+        </div>
         <button
           :disabled="selected.size === 0 || confirming"
           @click="confirmBooking"

@@ -12,6 +12,7 @@ import AdminMenuView from '../views/admin/AdminMenuView.vue'
 import AdminBookingsView from '../views/admin/AdminBookingsView.vue'
 import AdminOrdersView from '../views/admin/AdminOrdersView.vue'
 import AdminReportsView from '../views/admin/AdminReportsView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
@@ -60,6 +61,11 @@ const router = createRouter({
         { path: 'orders', name: 'admin-orders', component: AdminOrdersView },
         { path: 'reports', name: 'admin-reports', component: AdminReportsView },
       ],
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: NotFoundView,
     },
   ],
 })

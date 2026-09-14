@@ -32,7 +32,7 @@ function formatTime(iso) {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="b in bookings" :key="b.id" class="border-t border-border">
+        <tr v-for="b in bookings" :key="b.id" class="border-t border-border transition-colors hover:bg-white/[0.02]">
           <td class="py-2">{{ b.User?.name }}</td>
           <td class="py-2">{{ b.Showtime?.movie_title }}</td>
           <td class="py-2">{{ b.Seat?.seat_row }}{{ b.Seat?.seat_number }}</td>

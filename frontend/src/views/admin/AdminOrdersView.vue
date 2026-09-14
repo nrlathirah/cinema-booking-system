@@ -23,7 +23,7 @@ function formatTime(iso) {
     <p v-if="loading" class="text-muted">Loading...</p>
     <p v-else-if="orders.length === 0" class="text-muted">No orders yet.</p>
     <div v-else class="space-y-3">
-      <div v-for="o in orders" :key="o.id" class="border border-border p-3 text-sm">
+      <div v-for="o in orders" :key="o.id" class="border border-border p-3 text-sm transition-colors hover:bg-white/[0.02]">
         <div class="flex justify-between mb-2">
           <span class="font-medium">{{ o.User?.name }}</span>
           <span>RM {{ Number(o.total_price).toFixed(2) }}</span>

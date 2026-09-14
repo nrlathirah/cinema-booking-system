@@ -2,8 +2,10 @@
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useCartStore } from '../stores/cart'
 
 const auth = useAuthStore()
+const cart = useCartStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -38,9 +40,10 @@ function handleLogout() {
         </router-link>
         <router-link
           to="/menu"
-          class="hidden border-l border-border px-4 text-muted transition-colors hover:text-ink sm:inline"
+          class="hidden items-center gap-1.5 border-l border-border px-4 text-muted transition-colors hover:text-ink sm:inline-flex"
         >
           FOOD &amp; DRINKS
+          <span v-if="cart.count > 0" class="bg-accent px-1.5 py-0.5 text-[10px] font-bold text-bg">{{ cart.count }}</span>
         </router-link>
         <router-link
           v-if="auth.isAdmin"
@@ -96,8 +99,12 @@ function handleLogout() {
       <router-link to="/showtimes" class="border-b border-border px-6 py-3 text-muted hover:text-ink">
         SHOWTIMES
       </router-link>
-      <router-link to="/menu" class="border-b border-border px-6 py-3 text-muted hover:text-ink">
+      <router-link
+        to="/menu"
+        class="flex items-center justify-between border-b border-border px-6 py-3 text-muted hover:text-ink"
+      >
         FOOD &amp; DRINKS
+        <span v-if="cart.count > 0" class="bg-accent px-1.5 py-0.5 text-[10px] font-bold text-bg">{{ cart.count }}</span>
       </router-link>
       <router-link
         v-if="auth.isAdmin"
