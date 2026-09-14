@@ -1,5 +1,6 @@
 <script setup>
 import AppNav from './components/AppNav.vue'
+import AppFooter from './components/AppFooter.vue'
 import AppToast from './components/AppToast.vue'
 </script>
 
@@ -11,6 +12,7 @@ import AppToast from './components/AppToast.vue'
         <component :is="Component" />
       </Transition>
     </router-view>
+    <AppFooter />
     <AppToast />
   </div>
 </template>
