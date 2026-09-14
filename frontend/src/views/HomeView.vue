@@ -5,12 +5,14 @@ import MovieGroup from '../components/MovieGroup.vue'
 import SkeletonRow from '../components/SkeletonRow.vue'
 
 const showtimes = ref([])
+const menuItems = ref([])
 const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const { data } = await api.get('/showtimes')
-    showtimes.value = data.showtimes
+    const [showtimesRes, menuRes] = await Promise.all([api.get('/showtimes'), api.get('/menu')])
+    showtimes.value = showtimesRes.data.showtimes
+    menuItems.value = menuRes.data.items.slice(0, 4)
   } finally {
     loading.value = false
   }
@@ -30,10 +32,30 @@ const movies = computed(() => {
     }
     map.get(s.movie_title).sessions.push({ id: s.id, hallName: s.Hall?.name, startTime: s.start_time })
   }
-  return [...map.values()].slice(0, 3)
+  return [...map.values()]
 })
 
-const tickerItems = ['NOW BOOKING', 'LIVE SEAT LOCK', 'INSTANT CONFIRMATION', '04 HALLS OPEN', 'F&B AT YOUR SEAT']
+const movieCount = computed(() => movies.value.length)
+const sessionCount = computed(() => showtimes.value.length)
+const hallCount = computed(() => new Set(showtimes.value.map((s) => s.Hall?.id).filter(Boolean)).size)
+
+const tickerItems = computed(() => [
+  'NOW BOOKING',
+  'LIVE SEAT LOCK',
+  'INSTANT CONFIRMATION',
+  loading.value ? 'HALLS OPEN' : `${hallCount.value} HALL${hallCount.value === 1 ? '' : 'S'} OPEN`,
+  'F&B AT YOUR SEAT',
+])
+
+const steps = [
+  { n: '01', title: 'Pick a showtime', body: "Browse what's playing and choose your session." },
+  {
+    n: '02',
+    title: 'Lock your seat',
+    body: 'Select seats live over a socket — nobody else can grab them while you decide.',
+  },
+  { n: '03', title: 'Add concessions', body: 'Bundle popcorn & drinks with your booking, or order them on their own.' },
+]
 </script>
 
 <template>
@@ -49,7 +71,7 @@ const tickerItems = ['NOW BOOKING', 'LIVE SEAT LOCK', 'INSTANT CONFIRMATION', '0
             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
             <span class="relative inline-flex h-2 w-2 rounded-full bg-accent" />
           </span>
-          BOOKING TERMINAL / HALL 01–02
+          BOOKING TERMINAL
         </p>
         <h1 class="font-display text-[13vw] font-extrabold uppercase leading-[0.9] text-ink sm:text-7xl">
           Book<br />your<br />seat<span class="blink-cursor text-accent">_</span>
@@ -57,12 +79,12 @@ const tickerItems = ['NOW BOOKING', 'LIVE SEAT LOCK', 'INSTANT CONFIRMATION', '0
 
         <div class="hud-corners mt-10 flex flex-wrap gap-10 border-y border-border py-5">
           <div class="flex flex-col gap-1 text-xs text-muted">
-            <span class="font-display text-xl font-bold text-ink">04</span>
-            Halls
+            <span class="font-display text-xl font-bold text-ink">{{ loading ? '—' : movieCount }}</span>
+            Movies
           </div>
           <div class="flex flex-col gap-1 text-xs text-muted">
-            <span class="font-display text-xl font-bold text-ink">300+</span>
-            Seats
+            <span class="font-display text-xl font-bold text-ink">{{ loading ? '—' : sessionCount }}</span>
+            Sessions
           </div>
           <div class="flex flex-col gap-1 text-xs text-muted">
             <span class="font-display text-xl font-bold text-ink">Live</span>
@@ -104,12 +126,49 @@ const tickerItems = ['NOW BOOKING', 'LIVE SEAT LOCK', 'INSTANT CONFIRMATION', '0
         <router-link to="/showtimes" class="text-xs text-accent hover:text-accent-dim">See all →</router-link>
       </div>
       <template v-if="loading">
-        <SkeletonRow v-for="n in 2" :key="n" />
+        <SkeletonRow v-for="n in 3" :key="n" />
       </template>
       <template v-else-if="movies.length > 0">
-        <MovieGroup v-for="m in movies" :key="m.movieTitle" :movie="m" />
+        <MovieGroup v-for="m in movies.slice(0, 6)" :key="m.movieTitle" :movie="m" />
       </template>
       <p v-else class="py-6 text-sm text-muted">No showtimes yet. Check back soon.</p>
+    </section>
+
+    <section class="border-t border-border px-6 py-14">
+      <div class="mx-auto max-w-4xl">
+        <p class="mb-8 text-xs tracking-[0.14em] text-accent">HOW IT WORKS</p>
+        <div class="grid gap-8 sm:grid-cols-3">
+          <div v-for="step in steps" :key="step.n">
+            <p class="font-display mb-3 text-3xl font-extrabold text-accent">{{ step.n }}</p>
+            <p class="font-display mb-1 text-base font-bold text-ink">{{ step.title }}</p>
+            <p class="text-xs leading-relaxed text-muted">{{ step.body }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section v-if="!loading && menuItems.length > 0" class="border-t border-border px-6 py-14">
+      <div class="mx-auto max-w-4xl">
+        <div class="mb-6 flex items-baseline justify-between">
+          <p class="text-xs tracking-[0.14em] text-accent">CONCESSIONS</p>
+          <router-link to="/menu" class="text-xs text-accent hover:text-accent-dim">Order now →</router-link>
+        </div>
+        <div class="grid grid-cols-2 gap-5 sm:grid-cols-4">
+          <router-link v-for="item in menuItems" :key="item.id" to="/menu" class="group block">
+            <div class="aspect-square overflow-hidden border border-border bg-white/5">
+              <img
+                v-if="item.image_url"
+                :src="item.image_url"
+                :alt="item.name"
+                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                loading="lazy"
+              />
+            </div>
+            <p class="font-display mt-2 truncate text-sm font-bold text-ink">{{ item.name }}</p>
+            <p class="text-xs text-muted">RM {{ Number(item.price).toFixed(2) }}</p>
+          </router-link>
+        </div>
+      </div>
     </section>
   </div>
 </template>
