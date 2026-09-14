@@ -22,6 +22,8 @@ onMounted(async () => {
     <p class="text-neutral-400">Cinema seat booking + F&amp;B ordering</p>
     <p class="text-sm text-neutral-500">API status: {{ status }}</p>
 
+    <router-link to="/showtimes" class="rounded bg-indigo-600 px-4 py-2 text-sm hover:bg-indigo-500">Browse Showtimes</router-link>
+
     <div v-if="auth.isAuthenticated" class="flex flex-col items-center gap-2">
       <p class="text-sm">Logged in as <span class="font-medium">{{ auth.user?.name }}</span> ({{ auth.user?.role }})</p>
       <button
@@ -32,7 +34,7 @@ onMounted(async () => {
       </button>
     </div>
     <div v-else class="flex gap-3">
-      <router-link to="/login" class="rounded bg-indigo-600 px-4 py-2 text-sm hover:bg-indigo-500">Login</router-link>
+      <router-link to="/login" class="rounded bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-700">Login</router-link>
       <router-link to="/register" class="rounded bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-700">Register</router-link>
     </div>
   </main>

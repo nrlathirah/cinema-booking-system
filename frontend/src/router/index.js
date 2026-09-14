@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
+import ShowtimesView from '../views/ShowtimesView.vue'
+import SeatMapView from '../views/SeatMapView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,6 +22,16 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: RegisterView,
+    },
+    {
+      path: '/showtimes',
+      name: 'showtimes',
+      component: ShowtimesView,
+    },
+    {
+      path: '/showtimes/:id/seats',
+      name: 'seat-map',
+      component: SeatMapView,
     },
   ],
 })

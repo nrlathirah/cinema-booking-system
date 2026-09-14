@@ -6,6 +6,8 @@ import { Server } from 'socket.io'
 import { sequelize } from './models/index.js'
 import healthRoutes from './routes/health.js'
 import authRoutes from './routes/auth.js'
+import showtimeRoutes from './routes/showtimes.js'
+import bookingRoutes from './routes/bookings.js'
 import { registerSocketHandlers } from './sockets/index.js'
 
 dotenv.config()
@@ -16,11 +18,15 @@ const io = new Server(httpServer, {
   cors: { origin: process.env.CLIENT_URL || 'http://localhost:5173' },
 })
 
+app.set('io', io)
+
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }))
 app.use(express.json())
 
 app.use('/api', healthRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/showtimes', showtimeRoutes)
+app.use('/api/bookings', bookingRoutes)
 
 registerSocketHandlers(io)
 
