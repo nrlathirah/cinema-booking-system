@@ -18,12 +18,12 @@ function formatTime(iso) {
 
 <template>
   <div class="max-w-3xl">
-    <h1 class="text-xl font-semibold mb-4">All Bookings</h1>
+    <h1 class="text-xl font-display font-bold uppercase tracking-wide mb-4">All Bookings</h1>
 
-    <p v-if="loading" class="text-neutral-400">Loading...</p>
-    <p v-else-if="bookings.length === 0" class="text-neutral-400">No bookings yet.</p>
+    <p v-if="loading" class="text-muted">Loading...</p>
+    <p v-else-if="bookings.length === 0" class="text-muted">No bookings yet.</p>
     <table v-else class="w-full text-sm">
-      <thead class="text-neutral-400 text-left">
+      <thead class="text-muted text-left">
         <tr>
           <th class="pb-2">Customer</th>
           <th class="pb-2">Movie</th>
@@ -32,7 +32,7 @@ function formatTime(iso) {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="b in bookings" :key="b.id" class="border-t border-neutral-800">
+        <tr v-for="b in bookings" :key="b.id" class="border-t border-border">
           <td class="py-2">{{ b.User?.name }}</td>
           <td class="py-2">{{ b.Showtime?.movie_title }}</td>
           <td class="py-2">{{ b.Seat?.seat_row }}{{ b.Seat?.seat_number }}</td>

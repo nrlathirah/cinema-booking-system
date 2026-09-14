@@ -12,46 +12,51 @@ function handleLogout() {
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 border-b border-neutral-800/80 bg-neutral-950/85 backdrop-blur">
-    <nav class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-      <router-link to="/" class="font-display text-2xl tracking-wide text-neutral-100">
-        SEAT<span class="text-red-500">FLOW</span>
+  <header class="sticky top-0 z-40 border-b-2 border-border bg-bg/95 backdrop-blur">
+    <nav class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4 font-mono">
+      <router-link to="/" class="font-display text-[17px] font-extrabold tracking-wide text-ink">
+        SEATFLOW
       </router-link>
 
-      <div class="flex items-center gap-5 text-sm">
+      <div class="flex items-center gap-0 text-xs">
         <router-link
           to="/showtimes"
-          class="hidden text-neutral-300 transition-colors hover:text-white sm:inline"
+          class="hidden border-l border-border px-4 text-muted transition-colors hover:text-ink sm:inline"
         >
-          Showtimes
+          SHOWTIMES
         </router-link>
-        <router-link to="/menu" class="hidden text-neutral-300 transition-colors hover:text-white sm:inline">
-          Food &amp; Drinks
+        <router-link
+          to="/menu"
+          class="hidden border-l border-border px-4 text-muted transition-colors hover:text-ink sm:inline"
+        >
+          FOOD &amp; DRINKS
         </router-link>
         <router-link
           v-if="auth.isAdmin"
           to="/admin"
-          class="hidden text-amber-400 transition-colors hover:text-amber-300 sm:inline"
+          class="hidden border-l border-border px-4 text-accent transition-colors hover:text-accent-dim sm:inline"
         >
-          Admin
+          ADMIN
         </router-link>
 
         <template v-if="auth.isAuthenticated">
-          <span class="hidden text-neutral-500 md:inline">{{ auth.user?.name }}</span>
+          <span class="hidden border-l border-border px-4 text-muted md:inline">{{ auth.user?.name }}</span>
           <button
             @click="handleLogout"
-            class="rounded-full border border-neutral-700 px-4 py-1.5 text-neutral-300 transition-colors hover:border-red-500 hover:text-white"
+            class="ml-4 border border-border px-4 py-1.5 text-muted transition-colors hover:border-accent hover:text-accent"
           >
-            Logout
+            LOGOUT
           </button>
         </template>
         <template v-else>
-          <router-link to="/login" class="text-neutral-300 transition-colors hover:text-white">Login</router-link>
+          <router-link to="/login" class="border-l border-border px-4 text-muted transition-colors hover:text-ink">
+            LOGIN
+          </router-link>
           <router-link
             to="/register"
-            class="rounded-full bg-red-600 px-4 py-1.5 font-medium text-white transition-colors hover:bg-red-500"
+            class="ml-4 bg-accent px-4 py-1.5 font-semibold text-bg transition-colors hover:bg-accent-dim"
           >
-            Sign up
+            SIGN UP
           </router-link>
         </template>
       </div>

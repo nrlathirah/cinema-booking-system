@@ -2,17 +2,20 @@
 </script>
 
 <template>
-  <div class="min-h-screen bg-neutral-950 text-neutral-100">
-    <div class="border-b border-neutral-800 px-6 py-3">
-      <p class="text-xs uppercase tracking-[0.3em] text-amber-500">🎬 Admin</p>
+  <div class="min-h-screen">
+    <div class="border-b border-border px-6 py-3">
+      <p class="text-xs tracking-[0.14em] text-accent">ADMIN TERMINAL</p>
     </div>
-    <nav class="flex flex-wrap gap-5 border-b border-neutral-800 px-6 py-3 text-sm">
-      <router-link to="/admin/showtimes" class="text-neutral-400 hover:text-amber-400" active-class="text-amber-400">Showtimes</router-link>
-      <router-link to="/admin/halls" class="text-neutral-400 hover:text-amber-400" active-class="text-amber-400">Halls</router-link>
-      <router-link to="/admin/menu" class="text-neutral-400 hover:text-amber-400" active-class="text-amber-400">Menu</router-link>
-      <router-link to="/admin/bookings" class="text-neutral-400 hover:text-amber-400" active-class="text-amber-400">Bookings</router-link>
-      <router-link to="/admin/orders" class="text-neutral-400 hover:text-amber-400" active-class="text-amber-400">Orders</router-link>
-      <router-link to="/admin/reports" class="text-neutral-400 hover:text-amber-400" active-class="text-amber-400">Reports</router-link>
+    <nav class="flex flex-wrap gap-0 border-b border-border text-xs">
+      <router-link
+        v-for="tab in ['showtimes', 'halls', 'menu', 'bookings', 'orders', 'reports']"
+        :key="tab"
+        :to="`/admin/${tab}`"
+        class="border-r border-border px-5 py-3 uppercase text-muted transition-colors hover:text-ink"
+        active-class="text-accent bg-white/[0.03]"
+      >
+        {{ tab }}
+      </router-link>
     </nav>
     <div class="p-6">
       <router-view />

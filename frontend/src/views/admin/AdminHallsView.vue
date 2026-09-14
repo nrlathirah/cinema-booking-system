@@ -34,17 +34,17 @@ onMounted(load)
 
 <template>
   <div class="max-w-xl">
-    <h1 class="text-xl font-semibold mb-4">Halls</h1>
+    <h1 class="text-xl font-display font-bold uppercase tracking-wide mb-4">Halls</h1>
 
     <form
       @submit.prevent="createHall"
-      class="grid grid-cols-3 gap-3 mb-8 bg-neutral-900 p-4 rounded border border-neutral-800"
+      class="grid grid-cols-3 gap-3 mb-8 bg-white/[0.02] p-4 border border-border"
     >
       <input
         v-model="form.name"
         placeholder="Hall name"
         required
-        class="rounded bg-neutral-800 border border-neutral-700 px-3 py-2 col-span-3"
+        class="bg-transparent border border-border px-3 py-2 col-span-3"
       />
       <input
         v-model.number="form.rows"
@@ -53,7 +53,7 @@ onMounted(load)
         max="26"
         placeholder="Rows"
         required
-        class="rounded bg-neutral-800 border border-neutral-700 px-3 py-2"
+        class="bg-transparent border border-border px-3 py-2"
       />
       <input
         v-model.number="form.seatsPerRow"
@@ -61,20 +61,20 @@ onMounted(load)
         min="1"
         placeholder="Seats/row"
         required
-        class="rounded bg-neutral-800 border border-neutral-700 px-3 py-2 col-span-2"
+        class="bg-transparent border border-border px-3 py-2 col-span-2"
       />
       <p v-if="error" class="text-sm text-red-400 col-span-3">{{ error }}</p>
       <button
         :disabled="saving"
-        class="rounded bg-amber-600 px-4 py-2 text-sm text-black font-medium hover:bg-amber-500 disabled:opacity-50 col-span-3"
+        class="bg-accent px-4 py-2 text-sm text-bg font-medium hover:bg-accent-dim disabled:opacity-50 col-span-3"
       >
         {{ saving ? 'Creating...' : 'Create hall + seat layout' }}
       </button>
     </form>
 
-    <p v-if="loading" class="text-neutral-400">Loading...</p>
+    <p v-if="loading" class="text-muted">Loading...</p>
     <ul v-else class="space-y-2">
-      <li v-for="h in halls" :key="h.id" class="rounded border border-neutral-800 p-3 text-sm">
+      <li v-for="h in halls" :key="h.id" class="border border-border p-3 text-sm">
         {{ h.name }} — {{ h.rows }} rows × {{ h.seats_per_row }} seats
       </li>
     </ul>

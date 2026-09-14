@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import api from '../services/api'
-import PosterCard from '../components/PosterCard.vue'
+import ShowtimeRow from '../components/ShowtimeRow.vue'
 
 const showtimes = ref([])
 const loading = ref(true)
@@ -18,44 +18,49 @@ onMounted(async () => {
 
 <template>
   <div>
-    <section class="bg-vignette relative border-b border-neutral-800">
-      <div class="film-strip" />
-      <div class="mx-auto max-w-4xl px-6 py-24 text-center sm:py-28">
-        <p class="mb-4 text-sm uppercase tracking-[0.3em] text-red-500">Now booking</p>
-        <h1 class="font-display text-6xl leading-none tracking-wide text-white sm:text-7xl">
-          Your Seat. Your Snacks.
-          <span class="text-red-500">One Tap.</span>
-        </h1>
-        <p class="mx-auto mt-6 max-w-xl text-neutral-400">
-          Pick a showtime, grab a seat before anyone else does, and order popcorn &amp; drinks without leaving
-          your seat.
-        </p>
-        <div class="mt-10 flex flex-wrap justify-center gap-4">
-          <router-link
-            to="/showtimes"
-            class="rounded-full bg-red-600 px-8 py-3 font-medium text-white transition-colors hover:bg-red-500"
-          >
-            Browse Showtimes
-          </router-link>
-          <router-link
-            to="/menu"
-            class="rounded-full border border-neutral-700 px-8 py-3 font-medium text-neutral-200 transition-colors hover:border-amber-400 hover:text-amber-400"
-          >
-            Order Food &amp; Drinks
-          </router-link>
+    <header class="mx-auto max-w-4xl px-6 pt-16 pb-10 sm:pt-20">
+      <p class="mb-4 text-xs tracking-[0.14em] text-accent">BOOKING TERMINAL / HALL 01–02</p>
+      <h1 class="font-display text-[13vw] font-extrabold uppercase leading-[0.9] text-ink sm:text-7xl">
+        Book<br />your<br />seat<span class="blink-cursor text-accent">_</span>
+      </h1>
+
+      <div class="hud-corners mt-10 flex flex-wrap gap-10 border-y border-border py-5">
+        <div class="flex flex-col gap-1 text-xs text-muted">
+          <span class="font-display text-xl font-bold text-ink">04</span>
+          Halls
+        </div>
+        <div class="flex flex-col gap-1 text-xs text-muted">
+          <span class="font-display text-xl font-bold text-ink">300+</span>
+          Seats
+        </div>
+        <div class="flex flex-col gap-1 text-xs text-muted">
+          <span class="font-display text-xl font-bold text-ink">Live</span>
+          Seat lock
         </div>
       </div>
-      <div class="film-strip" />
-    </section>
 
-    <section v-if="!loading && showtimes.length > 0" class="mx-auto max-w-5xl px-6 py-16">
-      <div class="mb-6 flex items-end justify-between">
-        <h2 class="font-display text-2xl tracking-wide text-white">Now Showing</h2>
-        <router-link to="/showtimes" class="text-sm text-red-400 hover:text-red-300">See all →</router-link>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <router-link
+          to="/showtimes"
+          class="bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim"
+        >
+          Select seats →
+        </router-link>
+        <router-link
+          to="/menu"
+          class="border border-border px-6 py-3 text-xs uppercase tracking-wide text-muted transition-colors hover:border-accent hover:text-accent"
+        >
+          Food &amp; drinks
+        </router-link>
       </div>
-      <div class="grid grid-cols-2 gap-5 sm:grid-cols-4">
-        <PosterCard v-for="s in showtimes" :key="s.id" :showtime="s" />
+    </header>
+
+    <section v-if="!loading && showtimes.length > 0" class="mx-auto max-w-4xl px-6 pb-20">
+      <div class="mb-1 flex items-baseline justify-between border-b border-border pb-3">
+        <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink">Now Showing</h2>
+        <router-link to="/showtimes" class="text-xs text-accent hover:text-accent-dim">See all →</router-link>
       </div>
+      <ShowtimeRow v-for="s in showtimes" :key="s.id" :showtime="s" />
     </section>
   </div>
 </template>

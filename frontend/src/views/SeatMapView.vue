@@ -99,28 +99,25 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="min-h-screen bg-neutral-950 px-6 py-8 pb-32 text-neutral-100">
+  <main class="min-h-screen px-6 py-8 pb-32">
     <div class="mx-auto max-w-lg">
-      <button
-        class="mb-4 text-sm text-neutral-400 transition-colors hover:text-white"
-        @click="router.push('/showtimes')"
-      >
+      <button class="mb-4 text-xs text-muted transition-colors hover:text-ink" @click="router.push('/showtimes')">
         ← Back to showtimes
       </button>
 
       <div v-if="showtime" class="mb-10">
-        <p class="text-xs uppercase tracking-[0.3em] text-red-500">Select your seats</p>
-        <h1 class="font-display text-3xl tracking-wide text-white">{{ showtime.movie_title }}</h1>
-        <p class="text-sm text-neutral-500">{{ showtime.Hall?.name }}</p>
+        <p class="text-xs tracking-[0.14em] text-accent">SELECT YOUR SEATS</p>
+        <h1 class="font-display text-2xl font-bold uppercase text-ink">{{ showtime.movie_title }}</h1>
+        <p class="text-xs text-muted">{{ showtime.Hall?.name }}</p>
       </div>
 
       <!-- Screen -->
       <div class="mx-auto mb-10 w-full max-w-sm">
         <div
-          class="mx-auto h-2 w-full rounded-[100%] bg-gradient-to-b from-neutral-300/50 to-transparent"
-          style="box-shadow: 0 10px 40px 8px rgba(255, 255, 255, 0.07)"
+          class="mx-auto h-2 w-full rounded-[100%] bg-gradient-to-b from-accent/40 to-transparent"
+          style="box-shadow: 0 10px 40px 8px rgba(45, 212, 191, 0.08)"
         />
-        <p class="mt-2 text-center text-[11px] uppercase tracking-[0.35em] text-neutral-600">Screen</p>
+        <p class="mt-2 text-center text-[11px] tracking-[0.35em] text-muted">SCREEN</p>
       </div>
 
       <div class="mb-8 grid gap-2" style="grid-template-columns: repeat(8, minmax(0, 1fr))">
@@ -129,17 +126,15 @@ onBeforeUnmount(() => {
           :key="seat.id"
           :disabled="seatStatus(seat) === 'taken' || seatStatus(seat) === 'locked'"
           @click="toggleSeat(seat)"
-          class="flex aspect-square items-center justify-center rounded-t-lg rounded-b-sm border text-[11px] font-medium transition-all duration-150"
+          class="flex aspect-square items-center justify-center border text-[11px] font-medium transition-all duration-150"
           :class="{
-            'border-amber-600/50 bg-neutral-900 text-amber-400 hover:border-amber-400 hover:bg-amber-950/40':
+            'border-accent-dim/50 bg-transparent text-accent-dim hover:border-accent hover:text-accent':
               seatStatus(seat) === 'available' && seat.type === 'premium',
-            'border-neutral-700 bg-neutral-900 text-neutral-300 hover:border-red-500 hover:bg-red-950/30':
+            'border-border bg-transparent text-muted hover:border-accent hover:text-ink':
               seatStatus(seat) === 'available' && seat.type !== 'premium',
-            'scale-105 border-red-500 bg-red-600 text-white shadow-lg shadow-red-950/50':
-              seatStatus(seat) === 'selected',
-            'cursor-not-allowed border-neutral-800 bg-neutral-900 text-neutral-700 opacity-40':
-              seatStatus(seat) === 'taken',
-            'cursor-not-allowed animate-pulse border-amber-700 bg-amber-900/40 text-amber-500':
+            'scale-105 border-accent bg-accent font-bold text-bg': seatStatus(seat) === 'selected',
+            'cursor-not-allowed border-border/50 bg-transparent text-muted/30': seatStatus(seat) === 'taken',
+            'animate-pulse cursor-not-allowed border-accent-dim bg-accent-dim/20 text-accent-dim':
               seatStatus(seat) === 'locked',
           }"
         >
@@ -147,40 +142,36 @@ onBeforeUnmount(() => {
         </button>
       </div>
 
-      <div class="mb-6 flex flex-wrap gap-4 text-xs text-neutral-400">
+      <div class="mb-6 flex flex-wrap gap-4 text-xs text-muted">
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-3 w-3 rounded border border-neutral-700 bg-neutral-900"></span> Available
+          <span class="inline-block h-3 w-3 border border-border"></span> Available
         </span>
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-3 w-3 rounded border border-amber-600/50 bg-neutral-900"></span> Premium
+          <span class="inline-block h-3 w-3 border border-accent-dim/50 text-accent-dim"></span> Premium
         </span>
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-3 w-3 rounded bg-red-600"></span> Selected
+          <span class="inline-block h-3 w-3 bg-accent"></span> Selected
         </span>
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-3 w-3 rounded bg-amber-900/40"></span> Held by others
+          <span class="inline-block h-3 w-3 bg-accent-dim/30"></span> Held by others
         </span>
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-3 w-3 rounded border border-neutral-800 bg-neutral-900 opacity-50"></span> Taken
+          <span class="inline-block h-3 w-3 border border-border/50 opacity-50"></span> Taken
         </span>
       </div>
 
-      <p v-if="error" class="mb-4 text-sm text-red-400">{{ error }}</p>
+      <p v-if="error" class="mb-4 text-sm text-accent">{{ error }}</p>
     </div>
 
-    <div
-      class="fixed inset-x-0 bottom-0 border-t border-dashed border-neutral-700 bg-neutral-900/95 px-6 py-4 backdrop-blur"
-    >
+    <div class="fixed inset-x-0 bottom-0 border-t-2 border-border bg-bg/95 px-6 py-4 backdrop-blur">
       <div class="mx-auto flex max-w-lg items-center justify-between">
-        <p class="text-sm text-neutral-400">
-          {{ selected.size }} seat{{ selected.size === 1 ? '' : 's' }} selected
-        </p>
+        <p class="text-xs text-muted">{{ selected.size }} seat{{ selected.size === 1 ? '' : 's' }} selected</p>
         <button
           :disabled="selected.size === 0 || confirming"
           @click="confirmBooking"
-          class="rounded-full bg-red-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-40"
+          class="bg-accent px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim disabled:cursor-not-allowed disabled:opacity-30"
         >
-          {{ confirming ? 'Booking...' : 'Confirm booking' }}
+          {{ confirming ? 'Booking...' : 'Confirm booking →' }}
         </button>
       </div>
     </div>

@@ -47,22 +47,22 @@ onMounted(load)
 
 <template>
   <div class="max-w-3xl">
-    <h1 class="text-xl font-semibold mb-4">Showtimes</h1>
+    <h1 class="text-xl font-display font-bold uppercase tracking-wide mb-4">Showtimes</h1>
 
     <form
       @submit.prevent="createShowtime"
-      class="grid grid-cols-2 gap-3 mb-8 bg-neutral-900 p-4 rounded border border-neutral-800"
+      class="grid grid-cols-2 gap-3 mb-8 bg-white/[0.02] p-4 border border-border"
     >
       <input
         v-model="form.movieTitle"
         placeholder="Movie title"
         required
-        class="rounded bg-neutral-800 border border-neutral-700 px-3 py-2 col-span-2"
+        class="bg-transparent border border-border px-3 py-2 col-span-2"
       />
       <select
         v-model="form.hallId"
         required
-        class="rounded bg-neutral-800 border border-neutral-700 px-3 py-2 col-span-2"
+        class="bg-transparent border border-border px-3 py-2 col-span-2"
       >
         <option value="" disabled>Select hall</option>
         <option v-for="h in halls" :key="h.id" :value="h.id">{{ h.name }}</option>
@@ -71,26 +71,26 @@ onMounted(load)
         v-model="form.startTime"
         type="datetime-local"
         required
-        class="rounded bg-neutral-800 border border-neutral-700 px-3 py-2"
+        class="bg-transparent border border-border px-3 py-2"
       />
       <input
         v-model="form.endTime"
         type="datetime-local"
         required
-        class="rounded bg-neutral-800 border border-neutral-700 px-3 py-2"
+        class="bg-transparent border border-border px-3 py-2"
       />
       <p v-if="error" class="text-sm text-red-400 col-span-2">{{ error }}</p>
       <button
         :disabled="saving"
-        class="rounded bg-amber-600 px-4 py-2 text-sm text-black font-medium hover:bg-amber-500 disabled:opacity-50 col-span-2"
+        class="bg-accent px-4 py-2 text-sm text-bg font-medium hover:bg-accent-dim disabled:opacity-50 col-span-2"
       >
         {{ saving ? 'Adding...' : 'Add showtime' }}
       </button>
     </form>
 
-    <p v-if="loading" class="text-neutral-400">Loading...</p>
+    <p v-if="loading" class="text-muted">Loading...</p>
     <table v-else class="w-full text-sm">
-      <thead class="text-neutral-400 text-left">
+      <thead class="text-muted text-left">
         <tr>
           <th class="pb-2">Movie</th>
           <th class="pb-2">Hall</th>
@@ -99,7 +99,7 @@ onMounted(load)
         </tr>
       </thead>
       <tbody>
-        <tr v-for="s in showtimes" :key="s.id" class="border-t border-neutral-800">
+        <tr v-for="s in showtimes" :key="s.id" class="border-t border-border">
           <td class="py-2">{{ s.movie_title }}</td>
           <td class="py-2">{{ s.Hall?.name }}</td>
           <td class="py-2">{{ formatTime(s.start_time) }}</td>

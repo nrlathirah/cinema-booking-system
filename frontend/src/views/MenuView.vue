@@ -29,17 +29,6 @@ function quantityOf(menuItemId) {
   return cart.items.find((i) => i.menuItemId === menuItemId)?.quantity || 0
 }
 
-const categoryIcons = {
-  popcorn: '🍿',
-  drinks: '🥤',
-  snacks: '🌭',
-  combo: '🎬',
-}
-
-function iconFor(category) {
-  return categoryIcons[category] || '🍽️'
-}
-
 async function submitOrder() {
   if (!auth.isAuthenticated) {
     router.push('/login')
@@ -72,47 +61,45 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="min-h-screen bg-neutral-950 px-6 py-8 pb-32 text-neutral-100">
+  <main class="min-h-screen px-6 py-8 pb-32">
     <div class="mx-auto max-w-2xl">
-      <p class="mb-2 text-xs uppercase tracking-[0.3em] text-red-500">Concessions</p>
-      <h1 class="font-display mb-1 text-3xl tracking-wide text-white">Food &amp; Beverages</h1>
-      <p v-if="bookingId" class="mb-8 text-sm text-amber-400">
-        🎟️ Bundling with your seat booking #{{ bookingId }}
-      </p>
-      <p v-else class="mb-8 text-sm text-neutral-500">Order F&amp;B on its own</p>
+      <p class="mb-2 text-xs tracking-[0.14em] text-accent">CONCESSIONS MANIFEST</p>
+      <h1 class="font-display mb-1 text-3xl font-extrabold uppercase text-ink">Food &amp; Beverages</h1>
+      <p v-if="bookingId" class="mb-8 text-xs text-accent">Bundling with seat booking #{{ bookingId }}</p>
+      <p v-else class="mb-8 text-xs text-muted">Order F&amp;B on its own</p>
 
-      <p v-if="loading" class="text-neutral-400">Loading menu...</p>
+      <p v-if="loading" class="text-sm text-muted">Loading menu...</p>
 
       <div v-else class="space-y-8">
         <div v-for="(group, category) in grouped" :key="category">
-          <h2 class="mb-3 flex items-center gap-2 text-lg font-medium capitalize text-neutral-200">
-            <span>{{ iconFor(category) }}</span> {{ category }}
+          <h2 class="mb-2 border-b border-border pb-2 text-xs uppercase tracking-[0.14em] text-muted">
+            {{ category }}
           </h2>
-          <div class="space-y-2">
+          <div>
             <div
               v-for="item in group"
               :key="item.id"
-              class="flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900/60 p-3.5 transition-colors hover:border-neutral-700"
+              class="flex items-center justify-between border-b border-border py-3.5"
             >
               <div>
-                <p class="font-medium text-neutral-100">
+                <p class="font-display text-sm font-bold text-ink">
                   {{ item.name }}
-                  <span v-if="item.is_combo" class="ml-1 text-xs text-amber-400">(combo)</span>
+                  <span v-if="item.is_combo" class="ml-1 text-xs font-normal text-accent">(combo)</span>
                 </p>
-                <p class="text-sm text-neutral-500">RM {{ Number(item.price).toFixed(2) }}</p>
+                <p class="text-xs text-muted">RM {{ Number(item.price).toFixed(2) }}</p>
               </div>
               <div class="flex items-center gap-3">
                 <button
                   v-if="quantityOf(item.id) > 0"
                   @click="cart.decrementItem(item.id)"
-                  class="h-7 w-7 rounded-full bg-neutral-800 hover:bg-neutral-700"
+                  class="h-7 w-7 border border-border text-muted hover:border-accent hover:text-accent"
                 >
                   −
                 </button>
-                <span v-if="quantityOf(item.id) > 0" class="w-4 text-center text-sm">{{ quantityOf(item.id) }}</span>
+                <span v-if="quantityOf(item.id) > 0" class="w-4 text-center text-sm text-ink">{{ quantityOf(item.id) }}</span>
                 <button
                   @click="cart.addItem(item)"
-                  class="h-7 w-7 rounded-full bg-red-600 hover:bg-red-500"
+                  class="h-7 w-7 bg-accent font-bold text-bg hover:bg-accent-dim"
                 >
                   +
                 </button>
@@ -125,27 +112,27 @@ onMounted(async () => {
 
     <div
       v-if="cart.count > 0"
-      class="fixed inset-x-0 bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-neutral-700 bg-neutral-900/95 p-4 backdrop-blur"
+      class="fixed inset-x-0 bottom-0 border-t-2 border-border bg-bg/95 p-4 backdrop-blur"
     >
-      <div class="mx-auto flex w-full max-w-2xl items-center justify-between">
+      <div class="mx-auto flex w-full max-w-2xl flex-wrap items-center justify-between gap-3">
         <div>
-          <p class="text-sm text-neutral-400">{{ cart.count }} item{{ cart.count === 1 ? '' : 's' }}</p>
-          <p class="font-medium text-white">RM {{ cart.total.toFixed(2) }}</p>
+          <p class="text-xs text-muted">{{ cart.count }} item{{ cart.count === 1 ? '' : 's' }}</p>
+          <p class="font-display font-bold text-ink">RM {{ cart.total.toFixed(2) }}</p>
         </div>
         <div class="flex items-center gap-3">
-          <p v-if="error" class="text-sm text-red-400">{{ error }}</p>
+          <p v-if="error" class="text-xs text-accent">{{ error }}</p>
           <button
             :disabled="submitting"
             @click="submitOrder"
-            class="rounded-full bg-red-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-500 disabled:opacity-50"
+            class="bg-accent px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim disabled:opacity-50"
           >
-            {{ submitting ? 'Placing order...' : 'Confirm order' }}
+            {{ submitting ? 'Placing order...' : 'Confirm order →' }}
           </button>
         </div>
       </div>
     </div>
 
-    <router-link v-else to="/" class="fixed bottom-4 left-6 text-sm text-neutral-500 hover:text-neutral-300">
+    <router-link v-else to="/" class="fixed bottom-4 left-6 text-xs text-muted hover:text-ink">
       Skip, go home →
     </router-link>
   </main>

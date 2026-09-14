@@ -20,30 +20,30 @@ const maxOrderedQuantity = () => Math.max(1, ...mostOrderedItems.value.map((i) =
 
 <template>
   <div class="max-w-2xl">
-    <h1 class="text-xl font-semibold mb-6">Reports</h1>
+    <h1 class="text-xl font-display font-bold uppercase tracking-wide mb-6">Reports</h1>
 
-    <p v-if="loading" class="text-neutral-400">Loading...</p>
+    <p v-if="loading" class="text-muted">Loading...</p>
 
     <div v-else class="space-y-10">
       <!-- Headline stat tile -->
-      <div class="rounded border border-neutral-800 p-5">
-        <p class="text-sm text-neutral-400 mb-1">Total confirmed bookings</p>
-        <p class="text-3xl font-semibold tabular-nums">{{ totalBookings }}</p>
+      <div class="border border-border p-5">
+        <p class="text-sm text-muted mb-1">Total confirmed bookings</p>
+        <p class="text-3xl font-display font-bold uppercase tracking-wide tabular-nums">{{ totalBookings }}</p>
       </div>
 
       <!-- Seat utilization: single-series magnitude, one hue -->
       <section>
-        <h2 class="text-sm font-medium text-neutral-300 mb-3">Seat utilization by showtime</h2>
-        <div v-if="seatUtilization.length === 0" class="text-sm text-neutral-500">No showtimes yet.</div>
+        <h2 class="text-sm font-medium text-ink mb-3">Seat utilization by showtime</h2>
+        <div v-if="seatUtilization.length === 0" class="text-sm text-muted">No showtimes yet.</div>
         <div v-else class="space-y-3">
           <div v-for="s in seatUtilization" :key="s.showtimeId">
             <div class="flex justify-between text-sm mb-1">
-              <span class="text-neutral-200">{{ s.movieTitle }}</span>
-              <span class="text-neutral-400 tabular-nums">{{ s.booked }} / {{ s.capacity }} seats</span>
+              <span class="text-ink">{{ s.movieTitle }}</span>
+              <span class="text-muted tabular-nums">{{ s.booked }} / {{ s.capacity }} seats</span>
             </div>
-            <div class="h-2 rounded-full bg-neutral-800 overflow-hidden">
+            <div class="h-2 border border-border overflow-hidden">
               <div
-                class="h-full rounded-full bg-amber-500"
+                class="h-full bg-accent"
                 :style="{ width: `${Math.round(s.utilizationRate * 100)}%` }"
               />
             </div>
@@ -53,17 +53,17 @@ const maxOrderedQuantity = () => Math.max(1, ...mostOrderedItems.value.map((i) =
 
       <!-- Most ordered items: ranked magnitude, one hue -->
       <section>
-        <h2 class="text-sm font-medium text-neutral-300 mb-3">Most-ordered F&amp;B items</h2>
-        <div v-if="mostOrderedItems.length === 0" class="text-sm text-neutral-500">No orders yet.</div>
+        <h2 class="text-sm font-medium text-ink mb-3">Most-ordered F&amp;B items</h2>
+        <div v-if="mostOrderedItems.length === 0" class="text-sm text-muted">No orders yet.</div>
         <div v-else class="space-y-3">
           <div v-for="item in mostOrderedItems" :key="item.menuItemId">
             <div class="flex justify-between text-sm mb-1">
-              <span class="text-neutral-200">{{ item.name }}</span>
-              <span class="text-neutral-400 tabular-nums">{{ item.totalQuantity }}</span>
+              <span class="text-ink">{{ item.name }}</span>
+              <span class="text-muted tabular-nums">{{ item.totalQuantity }}</span>
             </div>
-            <div class="h-2 rounded-full bg-neutral-800 overflow-hidden">
+            <div class="h-2 border border-border overflow-hidden">
               <div
-                class="h-full rounded-full bg-amber-500"
+                class="h-full bg-accent"
                 :style="{ width: `${Math.round((item.totalQuantity / maxOrderedQuantity()) * 100)}%` }"
               />
             </div>
