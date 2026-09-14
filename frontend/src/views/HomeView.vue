@@ -22,7 +22,10 @@ onMounted(async () => {
     <p class="text-neutral-400">Cinema seat booking + F&amp;B ordering</p>
     <p class="text-sm text-neutral-500">API status: {{ status }}</p>
 
-    <router-link to="/showtimes" class="rounded bg-indigo-600 px-4 py-2 text-sm hover:bg-indigo-500">Browse Showtimes</router-link>
+    <div class="flex gap-3">
+      <router-link to="/showtimes" class="rounded bg-indigo-600 px-4 py-2 text-sm hover:bg-indigo-500">Browse Showtimes</router-link>
+      <router-link to="/menu" class="rounded bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-700">Order Food &amp; Drinks</router-link>
+    </div>
 
     <div v-if="auth.isAuthenticated" class="flex flex-col items-center gap-2">
       <p class="text-sm">Logged in as <span class="font-medium">{{ auth.user?.name }}</span> ({{ auth.user?.role }})</p>

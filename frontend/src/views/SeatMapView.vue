@@ -51,9 +51,10 @@ async function confirmBooking() {
   error.value = ''
   confirming.value = true
   try {
-    await api.post('/bookings', { showtimeId, seatIds: [...selected.value] })
+    const { data } = await api.post('/bookings', { showtimeId, seatIds: [...selected.value] })
     selected.value.clear()
-    await loadSeats()
+    const bookingId = data.bookings[0]?.id
+    router.push({ path: '/menu', query: bookingId ? { bookingId } : {} })
   } catch (err) {
     error.value = err.response?.data?.message || 'booking failed'
     await loadSeats()

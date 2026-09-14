@@ -3,7 +3,7 @@ dotenv.config()
 
 import models, { sequelize } from './models/index.js'
 
-const { Hall, Seat, Showtime } = models
+const { Hall, Seat, Showtime, MenuItem } = models
 
 const ROWS = ['A', 'B', 'C', 'D', 'E']
 const SEATS_PER_ROW = 8
@@ -55,6 +55,21 @@ async function seed() {
     console.log('seeded 2 showtimes')
   } else {
     console.log('showtimes already exist, skipping')
+  }
+
+  const existingMenuItems = await MenuItem.count()
+  if (existingMenuItems === 0) {
+    await MenuItem.bulkCreate([
+      { name: 'Popcorn (Salted)', category: 'popcorn', price: 12.9, is_combo: false },
+      { name: 'Popcorn (Caramel)', category: 'popcorn', price: 14.9, is_combo: false },
+      { name: 'Coca-Cola', category: 'drinks', price: 7.5, is_combo: false },
+      { name: 'Mineral Water', category: 'drinks', price: 4.5, is_combo: false },
+      { name: 'Nachos with Cheese', category: 'snacks', price: 15.9, is_combo: false },
+      { name: 'Popcorn + Drink Combo', category: 'combo', price: 18.9, is_combo: true },
+    ])
+    console.log('seeded 6 menu items')
+  } else {
+    console.log('menu items already exist, skipping')
   }
 
   await sequelize.close()

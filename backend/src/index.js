@@ -8,6 +8,8 @@ import healthRoutes from './routes/health.js'
 import authRoutes from './routes/auth.js'
 import showtimeRoutes from './routes/showtimes.js'
 import bookingRoutes from './routes/bookings.js'
+import menuRoutes from './routes/menu.js'
+import orderRoutes from './routes/orders.js'
 import { registerSocketHandlers } from './sockets/index.js'
 
 dotenv.config()
@@ -27,6 +29,8 @@ app.use('/api', healthRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/showtimes', showtimeRoutes)
 app.use('/api/bookings', bookingRoutes)
+app.use('/api/menu', menuRoutes)
+app.use('/api/orders', orderRoutes)
 
 registerSocketHandlers(io)
 
