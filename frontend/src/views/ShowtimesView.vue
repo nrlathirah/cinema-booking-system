@@ -1,8 +1,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import api from '../services/api'
-import MovieGroup from '../components/MovieGroup.vue'
-import SkeletonRow from '../components/SkeletonRow.vue'
+import MovieCard from '../components/MovieCard.vue'
+import SkeletonCard from '../components/SkeletonCard.vue'
 
 const showtimes = ref([])
 const loading = ref(true)
@@ -35,16 +35,16 @@ const movies = computed(() => {
 </script>
 
 <template>
-  <main class="mx-auto min-h-screen max-w-3xl px-6 py-12">
+  <main class="mx-auto min-h-screen max-w-5xl px-6 py-12">
     <p class="mb-2 text-xs tracking-[0.14em] text-accent">BOOKING TERMINAL</p>
     <h1 class="font-display mb-8 text-3xl font-extrabold uppercase text-ink">Showtimes</h1>
 
-    <template v-if="loading">
-      <SkeletonRow v-for="n in 3" :key="n" />
-    </template>
+    <div v-if="loading" class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+      <SkeletonCard v-for="n in 5" :key="n" />
+    </div>
     <p v-else-if="movies.length === 0" class="text-sm text-muted">No showtimes yet. Check back soon.</p>
-    <div v-else>
-      <MovieGroup v-for="m in movies" :key="m.movieTitle" :movie="m" />
+    <div v-else class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+      <MovieCard v-for="m in movies" :key="m.movieTitle" :movie="m" />
     </div>
   </main>
 </template>

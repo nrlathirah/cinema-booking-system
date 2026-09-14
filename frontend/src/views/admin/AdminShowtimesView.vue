@@ -14,6 +14,7 @@ const form = ref({
   startTime: '',
   endTime: '',
   posterUrl: '',
+  backdropUrl: '',
   genre: '',
   durationMinutes: '',
 })
@@ -37,6 +38,7 @@ async function createShowtime() {
       startTime: '',
       endTime: '',
       posterUrl: '',
+      backdropUrl: '',
       genre: '',
       durationMinutes: '',
     }
@@ -78,6 +80,11 @@ onMounted(load)
       <input
         v-model="form.posterUrl"
         placeholder="Poster URL (optional)"
+        class="bg-transparent border border-border px-3 py-2 sm:col-span-2"
+      />
+      <input
+        v-model="form.backdropUrl"
+        placeholder="Backdrop URL, wide image (optional)"
         class="bg-transparent border border-border px-3 py-2 sm:col-span-2"
       />
       <input

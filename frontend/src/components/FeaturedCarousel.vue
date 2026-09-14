@@ -9,19 +9,23 @@ const router = useRouter()
 
 const index = ref(0)
 const paused = ref(false)
+// Only the slide the viewer has actually reached gets its (heavy) image
+// requested — otherwise every slide's backdrop would load upfront.
+const loadedSlides = ref(new Set([0, 1]))
 let timer = null
 
 const reducedMotion =
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-function next() {
-  index.value = (index.value + 1) % props.movies.length
-}
-function prev() {
-  index.value = (index.value - 1 + props.movies.length) % props.movies.length
-}
 function goTo(i) {
   index.value = i
+  loadedSlides.value.add(i)
+}
+function next() {
+  goTo((index.value + 1) % props.movies.length)
+}
+function prev() {
+  goTo((index.value - 1 + props.movies.length) % props.movies.length)
 }
 
 function startAutoplay() {
@@ -52,7 +56,7 @@ function goToSeats(movie) {
 <template>
   <div
     v-if="movies.length > 0"
-    class="relative overflow-hidden border-y border-border"
+    class="relative overflow-hidden border-b border-border"
     @mouseenter="paused = true"
     @mouseleave="paused = false"
   >
@@ -64,11 +68,10 @@ function goToSeats(movie) {
         :class="i === index ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'"
       >
         <img
-          v-if="m.posterUrl"
-          :src="m.posterUrl"
+          v-if="loadedSlides.has(i) && (m.backdropUrl || m.posterUrl)"
+          :src="m.backdropUrl || m.posterUrl"
           :alt="m.movieTitle"
           class="h-full w-full object-cover"
-          loading="lazy"
         />
         <div v-else class="h-full w-full bg-white/5" />
         <div class="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />

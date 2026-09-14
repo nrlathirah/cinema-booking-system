@@ -1,5 +1,6 @@
 const TMDB_BASE = 'https://api.themoviedb.org/3'
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500'
+const TMDB_POSTER_BASE = 'https://image.tmdb.org/t/p/w500'
+const TMDB_BACKDROP_BASE = 'https://image.tmdb.org/t/p/w1280'
 
 export async function fetchMovieFromTMDB(title) {
   const apiKey = process.env.TMDB_API_KEY
@@ -18,7 +19,8 @@ export async function fetchMovieFromTMDB(title) {
     const details = detailsRes.ok ? await detailsRes.json() : {}
 
     return {
-      posterUrl: match.poster_path ? `${TMDB_IMAGE_BASE}${match.poster_path}` : null,
+      posterUrl: match.poster_path ? `${TMDB_POSTER_BASE}${match.poster_path}` : null,
+      backdropUrl: match.backdrop_path ? `${TMDB_BACKDROP_BASE}${match.backdrop_path}` : null,
       durationMinutes: details.runtime || null,
       genre: details.genres?.[0]?.name || null,
     }

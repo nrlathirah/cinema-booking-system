@@ -65,7 +65,7 @@ onMounted(async () => {
 
 <template>
   <main class="min-h-screen px-6 py-8 pb-32">
-    <div class="mx-auto max-w-2xl">
+    <div class="mx-auto max-w-4xl">
       <p class="mb-2 text-xs tracking-[0.14em] text-accent">CONCESSIONS MANIFEST</p>
       <h1 class="font-display mb-1 text-3xl font-extrabold uppercase text-ink">Food &amp; Beverages</h1>
       <p v-if="bookingId" class="mb-8 text-xs text-accent">Bundling with seat booking #{{ bookingId }}</p>
@@ -73,50 +73,58 @@ onMounted(async () => {
 
       <p v-if="loading" class="text-sm text-muted">Loading menu...</p>
 
-      <div v-else class="space-y-8">
+      <div v-else class="space-y-10">
         <div v-for="(group, category) in grouped" :key="category">
-          <h2 class="mb-2 border-b border-border pb-2 text-xs uppercase tracking-[0.14em] text-muted">
+          <h2 class="mb-4 border-b border-border pb-2 text-xs uppercase tracking-[0.14em] text-muted">
             {{ category }}
           </h2>
-          <div>
-            <div
-              v-for="item in group"
-              :key="item.id"
-              class="flex items-center justify-between gap-3 border-b border-border py-3.5"
-            >
-              <div class="flex min-w-0 items-center gap-3">
-                <div class="h-14 w-14 flex-shrink-0 overflow-hidden border border-border bg-white/5">
-                  <img
-                    v-if="item.image_url"
-                    :src="item.image_url"
-                    :alt="item.name"
-                    class="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <div class="min-w-0">
-                  <p class="font-display text-sm font-bold text-ink">
-                    {{ item.name }}
-                    <span v-if="item.is_combo" class="ml-1 text-xs font-normal text-accent">(combo)</span>
-                  </p>
-                  <p class="text-xs text-muted">RM {{ Number(item.price).toFixed(2) }}</p>
-                </div>
-              </div>
-              <div class="flex flex-shrink-0 items-center gap-3">
-                <button
+          <div class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+            <div v-for="item in group" :key="item.id" class="group">
+              <div class="relative aspect-square overflow-hidden border border-border bg-white/5">
+                <img
+                  v-if="item.image_url"
+                  :src="item.image_url"
+                  :alt="item.name"
+                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <span
                   v-if="quantityOf(item.id) > 0"
-                  @click="cart.decrementItem(item.id)"
-                  class="h-7 w-7 border border-border text-muted hover:border-accent hover:text-accent"
+                  class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center bg-accent text-xs font-bold text-bg"
                 >
-                  −
-                </button>
-                <span v-if="quantityOf(item.id) > 0" class="w-4 text-center text-sm text-ink">{{ quantityOf(item.id) }}</span>
+                  {{ quantityOf(item.id) }}
+                </span>
+              </div>
+
+              <p class="font-display mt-3 truncate text-sm font-bold text-ink">
+                {{ item.name }}
+                <span v-if="item.is_combo" class="ml-1 text-xs font-normal text-accent">(combo)</span>
+              </p>
+              <p class="text-xs text-muted">RM {{ Number(item.price).toFixed(2) }}</p>
+
+              <div class="mt-2.5">
                 <button
+                  v-if="quantityOf(item.id) === 0"
                   @click="cart.addItem(item)"
-                  class="h-7 w-7 bg-accent font-bold text-bg hover:bg-accent-dim"
+                  class="w-full border border-border py-1.5 text-xs uppercase tracking-wide text-muted transition-colors hover:border-accent hover:text-accent"
                 >
-                  +
+                  Add +
                 </button>
+                <div v-else class="flex items-center gap-2">
+                  <button
+                    @click="cart.decrementItem(item.id)"
+                    class="h-7 w-7 flex-shrink-0 border border-border text-muted hover:border-accent hover:text-accent"
+                  >
+                    −
+                  </button>
+                  <span class="flex-1 text-center text-sm text-ink">{{ quantityOf(item.id) }}</span>
+                  <button
+                    @click="cart.addItem(item)"
+                    class="h-7 w-7 flex-shrink-0 bg-accent font-bold text-bg hover:bg-accent-dim"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -128,7 +136,7 @@ onMounted(async () => {
       v-if="cart.count > 0"
       class="fixed inset-x-0 bottom-0 border-t-2 border-border bg-bg/95 p-4 backdrop-blur"
     >
-      <div class="mx-auto flex w-full max-w-2xl flex-wrap items-center justify-between gap-3">
+      <div class="mx-auto flex w-full max-w-4xl flex-wrap items-center justify-between gap-3">
         <div>
           <p class="text-xs text-muted">{{ cart.count }} item{{ cart.count === 1 ? '' : 's' }}</p>
           <p class="font-display font-bold text-ink">RM {{ cart.total.toFixed(2) }}</p>

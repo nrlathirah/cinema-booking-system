@@ -1,8 +1,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import api from '../services/api'
-import MovieGroup from '../components/MovieGroup.vue'
-import SkeletonRow from '../components/SkeletonRow.vue'
+import MovieCard from '../components/MovieCard.vue'
+import SkeletonCard from '../components/SkeletonCard.vue'
 import FeaturedCarousel from '../components/FeaturedCarousel.vue'
 
 const showtimes = ref([])
@@ -26,6 +26,7 @@ const movies = computed(() => {
       map.set(s.movie_title, {
         movieTitle: s.movie_title,
         posterUrl: s.poster_url,
+        backdropUrl: s.backdrop_url,
         genre: s.genre,
         durationMinutes: s.duration_minutes,
         sessions: [],
@@ -49,6 +50,8 @@ const steps = [
 
 <template>
   <div>
+    <FeaturedCarousel v-if="!loading" :movies="featuredMovies" />
+
     <header class="relative overflow-hidden px-6 pt-16 pb-10 sm:pt-20">
       <div
         class="pointer-events-none absolute left-1/2 top-0 -z-10 h-80 w-80 -translate-x-1/2 -translate-y-1/3 rounded-full bg-accent/10 blur-3xl"
@@ -98,19 +101,17 @@ const steps = [
       </div>
     </header>
 
-    <FeaturedCarousel v-if="!loading" :movies="featuredMovies" />
-
     <section class="mx-auto max-w-4xl px-6 py-10">
       <div class="mb-1 flex items-baseline justify-between border-b border-border pb-3">
         <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink">Now Showing</h2>
         <router-link to="/showtimes" class="text-xs text-accent hover:text-accent-dim">See all →</router-link>
       </div>
-      <template v-if="loading">
-        <SkeletonRow v-for="n in 3" :key="n" />
-      </template>
-      <template v-else-if="movies.length > 0">
-        <MovieGroup v-for="m in movies.slice(0, 3)" :key="m.movieTitle" :movie="m" />
-      </template>
+      <div v-if="loading" class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4">
+        <SkeletonCard v-for="n in 4" :key="n" />
+      </div>
+      <div v-else-if="movies.length > 0" class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4">
+        <MovieCard v-for="m in movies.slice(0, 4)" :key="m.movieTitle" :movie="m" />
+      </div>
       <p v-else class="py-6 text-sm text-muted">No showtimes yet. Check back soon.</p>
     </section>
 

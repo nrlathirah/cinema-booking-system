@@ -83,6 +83,18 @@ async function seed() {
       duration: 178,
       startHours: [1, 6],
     },
+    {
+      title: 'The Lord of the Rings: The Two Towers',
+      genre: 'Fantasy',
+      duration: 179,
+      startHours: [2, 8],
+    },
+    {
+      title: 'The Lord of the Rings: The Return of the King',
+      genre: 'Fantasy',
+      duration: 201,
+      startHours: [3, 9],
+    },
     { title: 'Spider-Man: Across the Spider-Verse', genre: 'Animation', duration: 140, startHours: [4] },
     { title: 'Mission: Impossible - Dead Reckoning Part One', genre: 'Action', duration: 163, startHours: [5] },
     { title: 'The Grand Budapest Hotel', genre: 'Comedy', duration: 100, startHours: [2] },
@@ -100,6 +112,7 @@ async function seed() {
     if (tmdbData?.posterUrl) tmdbHits++
 
     const posterUrl = tmdbData?.posterUrl || posterFor(movie.title)
+    const backdropUrl = tmdbData?.backdropUrl || posterUrl
     const genre = tmdbData?.genre || movie.genre
     const duration = tmdbData?.durationMinutes || movie.duration
 
@@ -113,6 +126,7 @@ async function seed() {
           movie_title: movie.title,
           hall_id: hall.id,
           poster_url: posterUrl,
+          backdrop_url: backdropUrl,
           genre,
           duration_minutes: duration,
           start_time: start,
@@ -124,7 +138,7 @@ async function seed() {
     } else {
       // Refresh existing sessions in case a TMDB key was added after the first seed run.
       await Showtime.update(
-        { poster_url: posterUrl, genre, duration_minutes: duration },
+        { poster_url: posterUrl, backdrop_url: backdropUrl, genre, duration_minutes: duration },
         { where: { movie_title: movie.title } },
       )
     }
