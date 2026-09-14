@@ -55,41 +55,56 @@ async function seed() {
     console.log(`${hall.name} already has seats, skipping`)
   }
 
-  const existingShowtimes = await Showtime.count()
-  if (existingShowtimes === 0) {
+  const MOVIES = [
+    { title: 'Dune: Part Three', genre: 'Sci-Fi', duration: 166, startHours: [2, 7] },
+    { title: 'The Batman Continues', genre: 'Action', duration: 148, startHours: [3] },
+    {
+      title: 'The Lord of the Rings: The Fellowship of the Ring',
+      genre: 'Fantasy',
+      duration: 178,
+      startHours: [1, 6],
+    },
+    { title: 'Spider-Verse: Beyond', genre: 'Animation', duration: 140, startHours: [4] },
+    { title: 'Mission Impossible: Legacy', genre: 'Action', duration: 152, startHours: [5] },
+    { title: 'The Grand Budapest Hotel II', genre: 'Comedy', duration: 105, startHours: [2] },
+    { title: "Oppenheimer: Director's Cut", genre: 'Drama', duration: 201, startHours: [8] },
+    { title: 'Avatar: The Deep Current', genre: 'Sci-Fi', duration: 192, startHours: [9] },
+    { title: 'John Wick: Chapter 5', genre: 'Action', duration: 135, startHours: [10] },
+    { title: 'Everything Everywhere: Reloaded', genre: 'Sci-Fi', duration: 139, startHours: [11] },
+    { title: 'Past Lives Forever', genre: 'Drama', duration: 105, startHours: [3] },
+  ]
+
+  let addedSessions = 0
+  for (const movie of MOVIES) {
+    const alreadyExists = await Showtime.count({ where: { movie_title: movie.title } })
+    if (alreadyExists > 0) continue
+
     const now = new Date()
-    await Showtime.bulkCreate([
-      {
-        movie_title: 'Dune: Part Three',
+    const rows = movie.startHours.map((hours) => {
+      const start = new Date(now.getTime() + hours * 60 * 60 * 1000)
+      const end = new Date(start.getTime() + movie.duration * 60 * 1000)
+      return {
+        movie_title: movie.title,
         hall_id: hall.id,
-        poster_url: posterFor('Dune: Part Three'),
-        genre: 'Sci-Fi',
-        duration_minutes: 166,
-        start_time: new Date(now.getTime() + 2 * 60 * 60 * 1000),
-        end_time: new Date(now.getTime() + 4 * 60 * 60 * 1000 + 46 * 60 * 1000),
-      },
-      {
-        movie_title: 'Dune: Part Three',
-        hall_id: hall.id,
-        poster_url: posterFor('Dune: Part Three'),
-        genre: 'Sci-Fi',
-        duration_minutes: 166,
-        start_time: new Date(now.getTime() + 6 * 60 * 60 * 1000),
-        end_time: new Date(now.getTime() + 8 * 60 * 60 * 1000 + 46 * 60 * 1000),
-      },
-      {
-        movie_title: 'The Batman Continues',
-        hall_id: hall.id,
-        poster_url: posterFor('The Batman Continues'),
-        genre: 'Action',
-        duration_minutes: 148,
-        start_time: new Date(now.getTime() + 5 * 60 * 60 * 1000),
-        end_time: new Date(now.getTime() + 7 * 60 * 60 * 1000 + 28 * 60 * 1000),
-      },
-    ])
-    console.log('seeded 3 showtimes')
-  } else {
-    console.log('showtimes already exist, skipping')
+        poster_url: posterFor(movie.title),
+        genre: movie.genre,
+        duration_minutes: movie.duration,
+        start_time: start,
+        end_time: end,
+      }
+    })
+    await Showtime.bulkCreate(rows)
+    addedSessions += rows.length
+  }
+  console.log(
+    addedSessions > 0
+      ? `seeded ${addedSessions} showtime session(s) across the movie catalog`
+      : 'movie catalog already up to date, skipping',
+  )
+
+  const removedTestMovie = await Showtime.destroy({ where: { movie_title: 'Test Movie' } })
+  if (removedTestMovie > 0) {
+    console.log('removed leftover "Test Movie" showtime')
   }
 
   const showtimesMissingPoster = await Showtime.findAll({ where: { poster_url: null } })

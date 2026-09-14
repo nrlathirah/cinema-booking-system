@@ -67,18 +67,18 @@ onMounted(load)
 
     <form
       @submit.prevent="createShowtime"
-      class="grid grid-cols-2 gap-3 mb-8 bg-white/[0.02] p-4 border border-border"
+      class="grid grid-cols-1 gap-3 mb-8 bg-white/[0.02] p-4 border border-border sm:grid-cols-2"
     >
       <input
         v-model="form.movieTitle"
         placeholder="Movie title"
         required
-        class="bg-transparent border border-border px-3 py-2 col-span-2"
+        class="bg-transparent border border-border px-3 py-2 sm:col-span-2"
       />
       <input
         v-model="form.posterUrl"
         placeholder="Poster URL (optional)"
-        class="bg-transparent border border-border px-3 py-2 col-span-2"
+        class="bg-transparent border border-border px-3 py-2 sm:col-span-2"
       />
       <input
         v-model="form.genre"
@@ -95,7 +95,7 @@ onMounted(load)
       <select
         v-model="form.hallId"
         required
-        class="bg-transparent border border-border px-3 py-2 col-span-2"
+        class="bg-transparent border border-border px-3 py-2 sm:col-span-2"
       >
         <option value="" disabled>Select hall</option>
         <option v-for="h in halls" :key="h.id" :value="h.id">{{ h.name }}</option>
@@ -112,41 +112,53 @@ onMounted(load)
         required
         class="bg-transparent border border-border px-3 py-2"
       />
-      <p v-if="error" class="text-sm text-red-400 col-span-2">{{ error }}</p>
+      <p v-if="error" class="text-sm text-red-400 sm:col-span-2">{{ error }}</p>
       <button
         :disabled="saving"
-        class="bg-accent px-4 py-2 text-sm text-bg font-medium hover:bg-accent-dim disabled:opacity-50 col-span-2"
+        class="bg-accent px-4 py-2 text-sm text-bg font-medium hover:bg-accent-dim disabled:opacity-50 sm:col-span-2"
       >
         {{ saving ? 'Adding...' : 'Add showtime' }}
       </button>
     </form>
 
     <p v-if="loading" class="text-muted">Loading...</p>
-    <table v-else class="w-full text-sm">
-      <thead class="text-muted text-left">
-        <tr>
-          <th class="pb-2"></th>
-          <th class="pb-2">Movie</th>
-          <th class="pb-2">Hall</th>
-          <th class="pb-2">Start</th>
-          <th class="pb-2"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="s in showtimes" :key="s.id" class="border-t border-border transition-colors hover:bg-white/[0.02]">
-          <td class="py-2">
-            <div class="h-14 w-10 overflow-hidden border border-border bg-white/5">
-              <img v-if="s.poster_url" :src="s.poster_url" :alt="s.movie_title" class="h-full w-full object-cover" />
-            </div>
-          </td>
-          <td class="py-2">{{ s.movie_title }}</td>
-          <td class="py-2">{{ s.Hall?.name }}</td>
-          <td class="py-2">{{ formatTime(s.start_time) }}</td>
-          <td class="py-2 text-right">
-            <button @click="removeShowtime(s.id)" class="text-red-400 hover:text-red-300 text-xs">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else class="overflow-x-auto">
+      <table class="w-full min-w-[480px] text-sm">
+        <thead class="text-muted text-left">
+          <tr>
+            <th class="pb-2"></th>
+            <th class="pb-2">Movie</th>
+            <th class="pb-2">Hall</th>
+            <th class="pb-2">Start</th>
+            <th class="pb-2"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="s in showtimes"
+            :key="s.id"
+            class="border-t border-border transition-colors hover:bg-white/[0.02]"
+          >
+            <td class="py-2">
+              <div class="h-14 w-10 overflow-hidden border border-border bg-white/5">
+                <img
+                  v-if="s.poster_url"
+                  :src="s.poster_url"
+                  :alt="s.movie_title"
+                  class="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            </td>
+            <td class="py-2">{{ s.movie_title }}</td>
+            <td class="py-2">{{ s.Hall?.name }}</td>
+            <td class="py-2 whitespace-nowrap">{{ formatTime(s.start_time) }}</td>
+            <td class="py-2 text-right">
+              <button @click="removeShowtime(s.id)" class="text-red-400 hover:text-red-300 text-xs">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>

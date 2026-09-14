@@ -38,13 +38,13 @@ onMounted(load)
 
     <form
       @submit.prevent="createHall"
-      class="grid grid-cols-3 gap-3 mb-8 bg-white/[0.02] p-4 border border-border"
+      class="grid grid-cols-2 gap-3 mb-8 bg-white/[0.02] p-4 border border-border sm:grid-cols-3"
     >
       <input
         v-model="form.name"
         placeholder="Hall name"
         required
-        class="bg-transparent border border-border px-3 py-2 col-span-3"
+        class="bg-transparent border border-border px-3 py-2 col-span-2 sm:col-span-3"
       />
       <input
         v-model.number="form.rows"
@@ -61,12 +61,12 @@ onMounted(load)
         min="1"
         placeholder="Seats/row"
         required
-        class="bg-transparent border border-border px-3 py-2 col-span-2"
+        class="bg-transparent border border-border px-3 py-2 sm:col-span-2"
       />
-      <p v-if="error" class="text-sm text-red-400 col-span-3">{{ error }}</p>
+      <p v-if="error" class="text-sm text-red-400 col-span-2 sm:col-span-3">{{ error }}</p>
       <button
         :disabled="saving"
-        class="bg-accent px-4 py-2 text-sm text-bg font-medium hover:bg-accent-dim disabled:opacity-50 col-span-3"
+        class="bg-accent px-4 py-2 text-sm text-bg font-medium hover:bg-accent-dim disabled:opacity-50 col-span-2 sm:col-span-3"
       >
         {{ saving ? 'Creating...' : 'Create hall + seat layout' }}
       </button>

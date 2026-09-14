@@ -38,13 +38,13 @@ onMounted(load)
 
     <form
       @submit.prevent="createItem"
-      class="grid grid-cols-2 gap-3 mb-8 bg-white/[0.02] p-4 border border-border"
+      class="grid grid-cols-1 gap-3 mb-8 bg-white/[0.02] p-4 border border-border sm:grid-cols-2"
     >
       <input
         v-model="form.name"
         placeholder="Name"
         required
-        class="bg-transparent border border-border px-3 py-2 col-span-2"
+        class="bg-transparent border border-border px-3 py-2 sm:col-span-2"
       />
       <input
         v-model="form.category"
@@ -64,15 +64,15 @@ onMounted(load)
       <input
         v-model="form.image_url"
         placeholder="Image URL (optional)"
-        class="bg-transparent border border-border px-3 py-2 col-span-2"
+        class="bg-transparent border border-border px-3 py-2 sm:col-span-2"
       />
-      <label class="flex items-center gap-2 text-sm col-span-2">
+      <label class="flex items-center gap-2 text-sm sm:col-span-2">
         <input v-model="form.is_combo" type="checkbox" /> Is combo
       </label>
-      <p v-if="error" class="text-sm text-red-400 col-span-2">{{ error }}</p>
+      <p v-if="error" class="text-sm text-red-400 sm:col-span-2">{{ error }}</p>
       <button
         :disabled="saving"
-        class="bg-accent px-4 py-2 text-sm text-bg font-medium hover:bg-accent-dim disabled:opacity-50 col-span-2"
+        class="bg-accent px-4 py-2 text-sm text-bg font-medium hover:bg-accent-dim disabled:opacity-50 sm:col-span-2"
       >
         {{ saving ? 'Adding...' : 'Add item' }}
       </button>
@@ -80,10 +80,20 @@ onMounted(load)
 
     <p v-if="loading" class="text-muted">Loading...</p>
     <ul v-else class="space-y-2">
-      <li v-for="item in items" :key="item.id" class="flex items-center justify-between gap-3 border border-border p-3 text-sm">
+      <li
+        v-for="item in items"
+        :key="item.id"
+        class="flex items-center justify-between gap-3 border border-border p-3 text-sm transition-colors hover:bg-white/[0.02]"
+      >
         <div class="flex min-w-0 items-center gap-3">
           <div class="h-10 w-10 flex-shrink-0 overflow-hidden border border-border bg-white/5">
-            <img v-if="item.image_url" :src="item.image_url" :alt="item.name" class="h-full w-full object-cover" />
+            <img
+              v-if="item.image_url"
+              :src="item.image_url"
+              :alt="item.name"
+              class="h-full w-full object-cover"
+              loading="lazy"
+            />
           </div>
           <span class="truncate">{{ item.name }} <span class="text-muted">({{ item.category }})</span></span>
         </div>

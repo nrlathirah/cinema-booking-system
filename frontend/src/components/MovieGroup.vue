@@ -27,7 +27,7 @@ function formatDuration(mins) {
         v-if="movie.posterUrl"
         :src="movie.posterUrl"
         :alt="movie.movieTitle"
-        class="h-full w-full object-cover"
+        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
         loading="lazy"
       />
       <div v-else class="font-display flex h-full w-full items-center justify-center text-xs text-muted">
