@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import api from '../services/api'
 import MovieGroup from '../components/MovieGroup.vue'
 import SkeletonRow from '../components/SkeletonRow.vue'
+import FeaturedCarousel from '../components/FeaturedCarousel.vue'
 
 const showtimes = ref([])
 const menuItems = ref([])
@@ -34,6 +35,8 @@ const movies = computed(() => {
   }
   return [...map.values()]
 })
+
+const featuredMovies = computed(() => movies.value.slice(0, 5))
 
 const movieCount = computed(() => movies.value.length)
 const sessionCount = computed(() => showtimes.value.length)
@@ -109,7 +112,9 @@ const steps = [
       </div>
     </header>
 
-    <div class="overflow-hidden border-y border-border py-2.5">
+    <FeaturedCarousel v-if="!loading" :movies="featuredMovies" />
+
+    <div class="overflow-hidden border-b border-border py-2.5">
       <div class="ticker-track flex w-max gap-10 whitespace-nowrap text-[11px] tracking-wide text-muted">
         <template v-for="n in 2" :key="n">
           <template v-for="(t, i) in tickerItems" :key="i">
