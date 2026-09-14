@@ -1,7 +1,7 @@
 import models, { sequelize } from '../models/index.js'
 import { calculateOrderTotal } from '../utils/pricing.js'
 
-const { Order, OrderItem, MenuItem, Booking } = models
+const { Order, OrderItem, MenuItem, Booking, User } = models
 
 export async function createOrder(req, res) {
   const { bookingId, items } = req.body
@@ -51,6 +51,17 @@ export async function listMyOrders(req, res) {
   const orders = await Order.findAll({
     where: { user_id: req.user.id },
     include: [{ model: OrderItem, include: [MenuItem] }],
+    order: [['createdAt', 'DESC']],
+  })
+  res.json({ orders })
+}
+
+export async function listAllOrders(req, res) {
+  const orders = await Order.findAll({
+    include: [
+      { model: User, attributes: ['id', 'name', 'email'] },
+      { model: OrderItem, include: [MenuItem] },
+    ],
     order: [['createdAt', 'DESC']],
   })
   res.json({ orders })

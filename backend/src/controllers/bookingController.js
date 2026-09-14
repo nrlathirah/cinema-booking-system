@@ -1,7 +1,7 @@
 import models, { sequelize } from '../models/index.js'
 import { clearSeatLock } from '../sockets/seatLocks.js'
 
-const { Booking } = models
+const { Booking, User, Showtime, Seat } = models
 
 export async function createBooking(req, res) {
   const { showtimeId, seatIds } = req.body
@@ -34,4 +34,16 @@ export async function createBooking(req, res) {
     }
     res.status(500).json({ message: 'booking failed', error: err.message })
   }
+}
+
+export async function listAllBookings(req, res) {
+  const bookings = await Booking.findAll({
+    include: [
+      { model: User, attributes: ['id', 'name', 'email'] },
+      { model: Showtime, attributes: ['id', 'movie_title', 'start_time'] },
+      { model: Seat, attributes: ['id', 'seat_row', 'seat_number'] },
+    ],
+    order: [['createdAt', 'DESC']],
+  })
+  res.json({ bookings })
 }

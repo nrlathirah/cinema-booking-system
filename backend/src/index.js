@@ -10,6 +10,7 @@ import showtimeRoutes from './routes/showtimes.js'
 import bookingRoutes from './routes/bookings.js'
 import menuRoutes from './routes/menu.js'
 import orderRoutes from './routes/orders.js'
+import hallRoutes from './routes/halls.js'
 import { registerSocketHandlers } from './sockets/index.js'
 
 dotenv.config()
@@ -31,6 +32,7 @@ app.use('/api/showtimes', showtimeRoutes)
 app.use('/api/bookings', bookingRoutes)
 app.use('/api/menu', menuRoutes)
 app.use('/api/orders', orderRoutes)
+app.use('/api/halls', hallRoutes)
 
 registerSocketHandlers(io)
 

@@ -1,9 +1,13 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
+import bcrypt from 'bcrypt'
 import models, { sequelize } from './models/index.js'
 
-const { Hall, Seat, Showtime, MenuItem } = models
+const { Hall, Seat, Showtime, MenuItem, User } = models
+
+const ADMIN_EMAIL = 'admin@seatflow.test'
+const ADMIN_PASSWORD = 'admin12345'
 
 const ROWS = ['A', 'B', 'C', 'D', 'E']
 const SEATS_PER_ROW = 8
@@ -70,6 +74,15 @@ async function seed() {
     console.log('seeded 6 menu items')
   } else {
     console.log('menu items already exist, skipping')
+  }
+
+  const existingAdmin = await User.findOne({ where: { email: ADMIN_EMAIL } })
+  if (!existingAdmin) {
+    const password_hash = await bcrypt.hash(ADMIN_PASSWORD, 10)
+    await User.create({ name: 'Admin', email: ADMIN_EMAIL, password_hash, role: 'admin' })
+    console.log(`seeded admin user (${ADMIN_EMAIL} / ${ADMIN_PASSWORD})`)
+  } else {
+    console.log('admin user already exists, skipping')
   }
 
   await sequelize.close()

@@ -29,6 +29,7 @@ onMounted(async () => {
 
     <div v-if="auth.isAuthenticated" class="flex flex-col items-center gap-2">
       <p class="text-sm">Logged in as <span class="font-medium">{{ auth.user?.name }}</span> ({{ auth.user?.role }})</p>
+      <router-link v-if="auth.isAdmin" to="/admin" class="text-sm text-indigo-400 hover:underline">Admin Panel</router-link>
       <button
         @click="auth.logout"
         class="rounded bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-700"
