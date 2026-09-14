@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import api from '../services/api'
 import MovieGroup from '../components/MovieGroup.vue'
+import SkeletonRow from '../components/SkeletonRow.vue'
 
 const showtimes = ref([])
 const loading = ref(true)
@@ -38,9 +39,10 @@ const movies = computed(() => {
     <p class="mb-2 text-xs tracking-[0.14em] text-accent">BOOKING TERMINAL</p>
     <h1 class="font-display mb-8 text-3xl font-extrabold uppercase text-ink">Showtimes</h1>
 
-    <p v-if="loading" class="text-sm text-muted">Loading...</p>
+    <template v-if="loading">
+      <SkeletonRow v-for="n in 3" :key="n" />
+    </template>
     <p v-else-if="movies.length === 0" class="text-sm text-muted">No showtimes yet. Check back soon.</p>
-
     <div v-else>
       <MovieGroup v-for="m in movies" :key="m.movieTitle" :movie="m" />
     </div>

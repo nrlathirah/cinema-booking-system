@@ -4,11 +4,13 @@ import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 import { useCartStore } from '../stores/cart'
+import { useToastStore } from '../stores/toast'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const cart = useCartStore()
+const toast = useToastStore()
 
 const bookingId = route.query.bookingId || null
 const items = ref([])
@@ -42,6 +44,7 @@ async function submitOrder() {
       items: cart.items.map((i) => ({ menuItemId: i.menuItemId, quantity: i.quantity })),
     })
     cart.clear()
+    toast.show('✓ Order placed — see you at the movies')
     router.push('/')
   } catch (err) {
     error.value = err.response?.data?.message || 'order failed'

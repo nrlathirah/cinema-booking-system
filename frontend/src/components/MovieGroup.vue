@@ -19,8 +19,10 @@ function formatDuration(mins) {
 </script>
 
 <template>
-  <div class="flex gap-4 border-b border-border py-5">
-    <div class="h-32 w-[85px] flex-shrink-0 overflow-hidden border border-border bg-white/5">
+  <div class="group flex gap-4 border-b border-border py-5">
+    <div
+      class="h-32 w-[85px] flex-shrink-0 overflow-hidden border border-border bg-white/5 transition-transform duration-200 group-hover:-translate-y-1 group-hover:border-accent-dim"
+    >
       <img
         v-if="movie.posterUrl"
         :src="movie.posterUrl"
@@ -46,7 +48,7 @@ function formatDuration(mins) {
         <button
           v-for="s in movie.sessions"
           :key="s.id"
-          class="border border-border px-3 py-1.5 text-xs text-muted transition-colors hover:border-accent hover:text-accent"
+          class="border border-border px-3 py-1.5 text-xs text-muted transition-all duration-150 hover:border-accent hover:text-accent active:scale-95"
           @click="router.push(`/showtimes/${s.id}/seats`)"
         >
           {{ formatTime(s.startTime) }} · {{ s.hallName }}

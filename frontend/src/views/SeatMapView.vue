@@ -4,10 +4,12 @@ import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
 import socket from '../services/socket'
 import { useAuthStore } from '../stores/auth'
+import { useToastStore } from '../stores/toast'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const toast = useToastStore()
 
 const showtimeId = route.params.id
 const showtime = ref(null)
@@ -52,8 +54,10 @@ async function confirmBooking() {
   confirming.value = true
   try {
     const { data } = await api.post('/bookings', { showtimeId, seatIds: [...selected.value] })
+    const seatCount = selected.value.size
     selected.value.clear()
     const bookingId = data.bookings[0]?.id
+    toast.show(`✓ ${seatCount} seat${seatCount === 1 ? '' : 's'} booked`)
     router.push({ path: '/menu', query: bookingId ? { bookingId } : {} })
   } catch (err) {
     error.value = err.response?.data?.message || 'booking failed'
