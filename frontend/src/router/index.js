@@ -11,6 +11,7 @@ import AdminHallsView from '../views/admin/AdminHallsView.vue'
 import AdminMenuView from '../views/admin/AdminMenuView.vue'
 import AdminBookingsView from '../views/admin/AdminBookingsView.vue'
 import AdminOrdersView from '../views/admin/AdminOrdersView.vue'
+import AdminReportsView from '../views/admin/AdminReportsView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
@@ -57,6 +58,7 @@ const router = createRouter({
         { path: 'menu', name: 'admin-menu', component: AdminMenuView },
         { path: 'bookings', name: 'admin-bookings', component: AdminBookingsView },
         { path: 'orders', name: 'admin-orders', component: AdminOrdersView },
+        { path: 'reports', name: 'admin-reports', component: AdminReportsView },
       ],
     },
   ],
