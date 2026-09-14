@@ -82,7 +82,7 @@ onMounted(load)
       <p v-if="error" class="text-sm text-red-400 col-span-2">{{ error }}</p>
       <button
         :disabled="saving"
-        class="rounded bg-indigo-600 px-4 py-2 text-sm hover:bg-indigo-500 disabled:opacity-50 col-span-2"
+        class="rounded bg-amber-600 px-4 py-2 text-sm text-black font-medium hover:bg-amber-500 disabled:opacity-50 col-span-2"
       >
         {{ saving ? 'Adding...' : 'Add showtime' }}
       </button>

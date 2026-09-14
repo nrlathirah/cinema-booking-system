@@ -1,45 +1,61 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useAuthStore } from '../stores/auth'
 import api from '../services/api'
+import PosterCard from '../components/PosterCard.vue'
 
-const auth = useAuthStore()
-const status = ref('checking...')
+const showtimes = ref([])
+const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await api.get('/health')
-    status.value = res.data.status
-  } catch (err) {
-    status.value = 'backend not reachable'
+    const { data } = await api.get('/showtimes')
+    showtimes.value = data.showtimes.slice(0, 4)
+  } finally {
+    loading.value = false
   }
 })
 </script>
 
 <template>
-  <main class="min-h-screen flex flex-col items-center justify-center gap-4 bg-neutral-950 text-neutral-100">
-    <h1 class="text-3xl font-semibold">SeatFlow</h1>
-    <p class="text-neutral-400">Cinema seat booking + F&amp;B ordering</p>
-    <p class="text-sm text-neutral-500">API status: {{ status }}</p>
+  <div>
+    <section class="bg-vignette relative border-b border-neutral-800">
+      <div class="film-strip" />
+      <div class="mx-auto max-w-4xl px-6 py-24 text-center sm:py-28">
+        <p class="mb-4 text-sm uppercase tracking-[0.3em] text-red-500">Now booking</p>
+        <h1 class="font-display text-6xl leading-none tracking-wide text-white sm:text-7xl">
+          Your Seat. Your Snacks.
+          <span class="text-red-500">One Tap.</span>
+        </h1>
+        <p class="mx-auto mt-6 max-w-xl text-neutral-400">
+          Pick a showtime, grab a seat before anyone else does, and order popcorn &amp; drinks without leaving
+          your seat.
+        </p>
+        <div class="mt-10 flex flex-wrap justify-center gap-4">
+          <router-link
+            to="/showtimes"
+            class="rounded-full bg-red-600 px-8 py-3 font-medium text-white transition-colors hover:bg-red-500"
+          >
+            Browse Showtimes
+          </router-link>
+          <router-link
+            to="/menu"
+            class="rounded-full border border-neutral-700 px-8 py-3 font-medium text-neutral-200 transition-colors hover:border-amber-400 hover:text-amber-400"
+          >
+            Order Food &amp; Drinks
+          </router-link>
+        </div>
+      </div>
+      <div class="film-strip" />
+    </section>
 
-    <div class="flex gap-3">
-      <router-link to="/showtimes" class="rounded bg-indigo-600 px-4 py-2 text-sm hover:bg-indigo-500">Browse Showtimes</router-link>
-      <router-link to="/menu" class="rounded bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-700">Order Food &amp; Drinks</router-link>
-    </div>
-
-    <div v-if="auth.isAuthenticated" class="flex flex-col items-center gap-2">
-      <p class="text-sm">Logged in as <span class="font-medium">{{ auth.user?.name }}</span> ({{ auth.user?.role }})</p>
-      <router-link v-if="auth.isAdmin" to="/admin" class="text-sm text-indigo-400 hover:underline">Admin Panel</router-link>
-      <button
-        @click="auth.logout"
-        class="rounded bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-700"
-      >
-        Logout
-      </button>
-    </div>
-    <div v-else class="flex gap-3">
-      <router-link to="/login" class="rounded bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-700">Login</router-link>
-      <router-link to="/register" class="rounded bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-700">Register</router-link>
-    </div>
-  </main>
+    <section v-if="!loading && showtimes.length > 0" class="mx-auto max-w-5xl px-6 py-16">
+      <div class="mb-6 flex items-end justify-between">
+        <h2 class="font-display text-2xl tracking-wide text-white">Now Showing</h2>
+        <router-link to="/showtimes" class="text-sm text-red-400 hover:text-red-300">See all →</router-link>
+      </div>
+      <div class="grid grid-cols-2 gap-5 sm:grid-cols-4">
+        <PosterCard v-for="s in showtimes" :key="s.id" :showtime="s" />
+      </div>
+    </section>
+  </div>
 </template>

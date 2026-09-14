@@ -1,1 +1,29 @@
 @import "tailwindcss";
+
+@theme {
+  --font-display: "Bebas Neue", sans-serif;
+}
+
+body {
+  background-color: #0a0a0a;
+}
+
+.bg-vignette {
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(220, 38, 38, 0.18), transparent 70%),
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(0, 0, 0, 0.9), transparent 70%),
+    #0a0a0a;
+}
+
+.film-strip {
+  height: 10px;
+  background-color: #18181b;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0px,
+    transparent 6px,
+    #0a0a0a 6px,
+    #0a0a0a 14px
+  );
+  background-size: 20px 100%;
+}

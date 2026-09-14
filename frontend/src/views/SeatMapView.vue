@@ -99,47 +99,90 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="min-h-screen bg-neutral-950 text-neutral-100 p-6">
-    <button class="text-sm text-neutral-400 mb-4" @click="router.push('/showtimes')">← Back</button>
-
-    <div v-if="showtime" class="mb-6">
-      <h1 class="text-2xl font-semibold">{{ showtime.movie_title }}</h1>
-      <p class="text-neutral-400 text-sm">{{ showtime.Hall?.name }}</p>
-    </div>
-
-    <div class="grid gap-2 mb-6" style="grid-template-columns: repeat(8, minmax(0, 1fr)); max-width: 480px">
+  <main class="min-h-screen bg-neutral-950 px-6 py-8 pb-32 text-neutral-100">
+    <div class="mx-auto max-w-lg">
       <button
-        v-for="seat in seats"
-        :key="seat.id"
-        :disabled="seatStatus(seat) === 'taken' || seatStatus(seat) === 'locked'"
-        @click="toggleSeat(seat)"
-        class="aspect-square rounded text-xs flex items-center justify-center border transition-colors"
-        :class="{
-          'bg-neutral-800 border-neutral-700 hover:border-indigo-500': seatStatus(seat) === 'available',
-          'bg-indigo-600 border-indigo-500': seatStatus(seat) === 'selected',
-          'bg-neutral-900 border-neutral-800 opacity-40 cursor-not-allowed': seatStatus(seat) === 'taken',
-          'bg-yellow-700 border-yellow-600 opacity-60 cursor-not-allowed': seatStatus(seat) === 'locked',
-        }"
+        class="mb-4 text-sm text-neutral-400 transition-colors hover:text-white"
+        @click="router.push('/showtimes')"
       >
-        {{ seat.seat_row }}{{ seat.seat_number }}
+        ← Back to showtimes
       </button>
+
+      <div v-if="showtime" class="mb-10">
+        <p class="text-xs uppercase tracking-[0.3em] text-red-500">Select your seats</p>
+        <h1 class="font-display text-3xl tracking-wide text-white">{{ showtime.movie_title }}</h1>
+        <p class="text-sm text-neutral-500">{{ showtime.Hall?.name }}</p>
+      </div>
+
+      <!-- Screen -->
+      <div class="mx-auto mb-10 w-full max-w-sm">
+        <div
+          class="mx-auto h-2 w-full rounded-[100%] bg-gradient-to-b from-neutral-300/50 to-transparent"
+          style="box-shadow: 0 10px 40px 8px rgba(255, 255, 255, 0.07)"
+        />
+        <p class="mt-2 text-center text-[11px] uppercase tracking-[0.35em] text-neutral-600">Screen</p>
+      </div>
+
+      <div class="mb-8 grid gap-2" style="grid-template-columns: repeat(8, minmax(0, 1fr))">
+        <button
+          v-for="seat in seats"
+          :key="seat.id"
+          :disabled="seatStatus(seat) === 'taken' || seatStatus(seat) === 'locked'"
+          @click="toggleSeat(seat)"
+          class="flex aspect-square items-center justify-center rounded-t-lg rounded-b-sm border text-[11px] font-medium transition-all duration-150"
+          :class="{
+            'border-amber-600/50 bg-neutral-900 text-amber-400 hover:border-amber-400 hover:bg-amber-950/40':
+              seatStatus(seat) === 'available' && seat.type === 'premium',
+            'border-neutral-700 bg-neutral-900 text-neutral-300 hover:border-red-500 hover:bg-red-950/30':
+              seatStatus(seat) === 'available' && seat.type !== 'premium',
+            'scale-105 border-red-500 bg-red-600 text-white shadow-lg shadow-red-950/50':
+              seatStatus(seat) === 'selected',
+            'cursor-not-allowed border-neutral-800 bg-neutral-900 text-neutral-700 opacity-40':
+              seatStatus(seat) === 'taken',
+            'cursor-not-allowed animate-pulse border-amber-700 bg-amber-900/40 text-amber-500':
+              seatStatus(seat) === 'locked',
+          }"
+        >
+          {{ seat.seat_row }}{{ seat.seat_number }}
+        </button>
+      </div>
+
+      <div class="mb-6 flex flex-wrap gap-4 text-xs text-neutral-400">
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block h-3 w-3 rounded border border-neutral-700 bg-neutral-900"></span> Available
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block h-3 w-3 rounded border border-amber-600/50 bg-neutral-900"></span> Premium
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block h-3 w-3 rounded bg-red-600"></span> Selected
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block h-3 w-3 rounded bg-amber-900/40"></span> Held by others
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block h-3 w-3 rounded border border-neutral-800 bg-neutral-900 opacity-50"></span> Taken
+        </span>
+      </div>
+
+      <p v-if="error" class="mb-4 text-sm text-red-400">{{ error }}</p>
     </div>
 
-    <div class="flex flex-wrap gap-4 text-xs text-neutral-400 mb-6">
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-neutral-800 border border-neutral-700 inline-block"></span> Available</span>
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-indigo-600 inline-block"></span> Selected</span>
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-700 inline-block"></span> Held by others</span>
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-neutral-900 border border-neutral-800 inline-block"></span> Taken</span>
-    </div>
-
-    <p v-if="error" class="text-sm text-red-400 mb-4">{{ error }}</p>
-
-    <button
-      :disabled="selected.size === 0 || confirming"
-      @click="confirmBooking"
-      class="rounded bg-indigo-600 px-4 py-2 text-sm hover:bg-indigo-500 disabled:opacity-50"
+    <div
+      class="fixed inset-x-0 bottom-0 border-t border-dashed border-neutral-700 bg-neutral-900/95 px-6 py-4 backdrop-blur"
     >
-      {{ confirming ? 'Booking...' : `Confirm booking (${selected.size} seat${selected.size === 1 ? '' : 's'})` }}
-    </button>
+      <div class="mx-auto flex max-w-lg items-center justify-between">
+        <p class="text-sm text-neutral-400">
+          {{ selected.size }} seat{{ selected.size === 1 ? '' : 's' }} selected
+        </p>
+        <button
+          :disabled="selected.size === 0 || confirming"
+          @click="confirmBooking"
+          class="rounded-full bg-red-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {{ confirming ? 'Booking...' : 'Confirm booking' }}
+        </button>
+      </div>
+    </div>
   </main>
 </template>

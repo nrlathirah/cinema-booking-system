@@ -43,7 +43,7 @@ const maxOrderedQuantity = () => Math.max(1, ...mostOrderedItems.value.map((i) =
             </div>
             <div class="h-2 rounded-full bg-neutral-800 overflow-hidden">
               <div
-                class="h-full rounded-full bg-indigo-500"
+                class="h-full rounded-full bg-amber-500"
                 :style="{ width: `${Math.round(s.utilizationRate * 100)}%` }"
               />
             </div>
@@ -63,7 +63,7 @@ const maxOrderedQuantity = () => Math.max(1, ...mostOrderedItems.value.map((i) =
             </div>
             <div class="h-2 rounded-full bg-neutral-800 overflow-hidden">
               <div
-                class="h-full rounded-full bg-indigo-500"
+                class="h-full rounded-full bg-amber-500"
                 :style="{ width: `${Math.round((item.totalQuantity / maxOrderedQuantity()) * 100)}%` }"
               />
             </div>
