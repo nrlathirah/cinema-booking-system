@@ -79,16 +79,27 @@ onMounted(async () => {
             <div
               v-for="item in group"
               :key="item.id"
-              class="flex items-center justify-between border-b border-border py-3.5"
+              class="flex items-center justify-between gap-3 border-b border-border py-3.5"
             >
-              <div>
-                <p class="font-display text-sm font-bold text-ink">
-                  {{ item.name }}
-                  <span v-if="item.is_combo" class="ml-1 text-xs font-normal text-accent">(combo)</span>
-                </p>
-                <p class="text-xs text-muted">RM {{ Number(item.price).toFixed(2) }}</p>
+              <div class="flex min-w-0 items-center gap-3">
+                <div class="h-14 w-14 flex-shrink-0 overflow-hidden border border-border bg-white/5">
+                  <img
+                    v-if="item.image_url"
+                    :src="item.image_url"
+                    :alt="item.name"
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="min-w-0">
+                  <p class="font-display text-sm font-bold text-ink">
+                    {{ item.name }}
+                    <span v-if="item.is_combo" class="ml-1 text-xs font-normal text-accent">(combo)</span>
+                  </p>
+                  <p class="text-xs text-muted">RM {{ Number(item.price).toFixed(2) }}</p>
+                </div>
               </div>
-              <div class="flex items-center gap-3">
+              <div class="flex flex-shrink-0 items-center gap-3">
                 <button
                   v-if="quantityOf(item.id) > 0"
                   @click="cart.decrementItem(item.id)"

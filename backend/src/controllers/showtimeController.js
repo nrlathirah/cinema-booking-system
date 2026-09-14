@@ -41,7 +41,7 @@ export async function getShowtimeSeats(req, res) {
 }
 
 export async function createShowtime(req, res) {
-  const { movieTitle, hallId, startTime, endTime } = req.body
+  const { movieTitle, hallId, startTime, endTime, posterUrl, genre, durationMinutes } = req.body
   if (!movieTitle || !hallId || !startTime || !endTime) {
     return res.status(400).json({ message: 'movieTitle, hallId, startTime and endTime are required' })
   }
@@ -56,6 +56,9 @@ export async function createShowtime(req, res) {
     hall_id: hallId,
     start_time: startTime,
     end_time: endTime,
+    poster_url: posterUrl || null,
+    genre: genre || null,
+    duration_minutes: durationMinutes || null,
   })
   res.status(201).json({ showtime })
 }
@@ -67,12 +70,15 @@ export async function updateShowtime(req, res) {
     return res.status(404).json({ message: 'showtime not found' })
   }
 
-  const { movieTitle, hallId, startTime, endTime } = req.body
+  const { movieTitle, hallId, startTime, endTime, posterUrl, genre, durationMinutes } = req.body
   await showtime.update({
     ...(movieTitle !== undefined && { movie_title: movieTitle }),
     ...(hallId !== undefined && { hall_id: hallId }),
     ...(startTime !== undefined && { start_time: startTime }),
     ...(endTime !== undefined && { end_time: endTime }),
+    ...(posterUrl !== undefined && { poster_url: posterUrl }),
+    ...(genre !== undefined && { genre }),
+    ...(durationMinutes !== undefined && { duration_minutes: durationMinutes }),
   })
   res.json({ showtime })
 }

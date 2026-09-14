@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import api from '../services/api'
-import ShowtimeRow from '../components/ShowtimeRow.vue'
+import MovieGroup from '../components/MovieGroup.vue'
 
 const showtimes = ref([])
 const loading = ref(true)
@@ -9,10 +9,27 @@ const loading = ref(true)
 onMounted(async () => {
   try {
     const { data } = await api.get('/showtimes')
-    showtimes.value = data.showtimes.slice(0, 4)
+    showtimes.value = data.showtimes
   } finally {
     loading.value = false
   }
+})
+
+const movies = computed(() => {
+  const map = new Map()
+  for (const s of showtimes.value) {
+    if (!map.has(s.movie_title)) {
+      map.set(s.movie_title, {
+        movieTitle: s.movie_title,
+        posterUrl: s.poster_url,
+        genre: s.genre,
+        durationMinutes: s.duration_minutes,
+        sessions: [],
+      })
+    }
+    map.get(s.movie_title).sessions.push({ id: s.id, hallName: s.Hall?.name, startTime: s.start_time })
+  }
+  return [...map.values()].slice(0, 3)
 })
 </script>
 
@@ -55,12 +72,12 @@ onMounted(async () => {
       </div>
     </header>
 
-    <section v-if="!loading && showtimes.length > 0" class="mx-auto max-w-4xl px-6 pb-20">
+    <section v-if="!loading && movies.length > 0" class="mx-auto max-w-4xl px-6 pb-20">
       <div class="mb-1 flex items-baseline justify-between border-b border-border pb-3">
         <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink">Now Showing</h2>
         <router-link to="/showtimes" class="text-xs text-accent hover:text-accent-dim">See all →</router-link>
       </div>
-      <ShowtimeRow v-for="s in showtimes" :key="s.id" :showtime="s" />
+      <MovieGroup v-for="m in movies" :key="m.movieTitle" :movie="m" />
     </section>
   </div>
 </template>

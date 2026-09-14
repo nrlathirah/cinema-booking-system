@@ -6,7 +6,7 @@ const items = ref([])
 const loading = ref(true)
 const error = ref('')
 const saving = ref(false)
-const form = ref({ name: '', category: '', price: '', is_combo: false })
+const form = ref({ name: '', category: '', price: '', is_combo: false, image_url: '' })
 
 async function load() {
   loading.value = true
@@ -20,7 +20,7 @@ async function createItem() {
   saving.value = true
   try {
     await api.post('/menu', form.value)
-    form.value = { name: '', category: '', price: '', is_combo: false }
+    form.value = { name: '', category: '', price: '', is_combo: false, image_url: '' }
     await load()
   } catch (err) {
     error.value = err.response?.data?.message || 'failed to add item'
@@ -61,6 +61,11 @@ onMounted(load)
         required
         class="bg-transparent border border-border px-3 py-2"
       />
+      <input
+        v-model="form.image_url"
+        placeholder="Image URL (optional)"
+        class="bg-transparent border border-border px-3 py-2 col-span-2"
+      />
       <label class="flex items-center gap-2 text-sm col-span-2">
         <input v-model="form.is_combo" type="checkbox" /> Is combo
       </label>
@@ -75,9 +80,14 @@ onMounted(load)
 
     <p v-if="loading" class="text-muted">Loading...</p>
     <ul v-else class="space-y-2">
-      <li v-for="item in items" :key="item.id" class="flex justify-between border border-border p-3 text-sm">
-        <span>{{ item.name }} <span class="text-muted">({{ item.category }})</span></span>
-        <span>RM {{ Number(item.price).toFixed(2) }}</span>
+      <li v-for="item in items" :key="item.id" class="flex items-center justify-between gap-3 border border-border p-3 text-sm">
+        <div class="flex min-w-0 items-center gap-3">
+          <div class="h-10 w-10 flex-shrink-0 overflow-hidden border border-border bg-white/5">
+            <img v-if="item.image_url" :src="item.image_url" :alt="item.name" class="h-full w-full object-cover" />
+          </div>
+          <span class="truncate">{{ item.name }} <span class="text-muted">({{ item.category }})</span></span>
+        </div>
+        <span class="flex-shrink-0">RM {{ Number(item.price).toFixed(2) }}</span>
       </li>
     </ul>
   </div>

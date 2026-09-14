@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import api from '../services/api'
-import ShowtimeRow from '../components/ShowtimeRow.vue'
+import MovieGroup from '../components/MovieGroup.vue'
 
 const showtimes = ref([])
 const loading = ref(true)
@@ -14,24 +14,35 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+const movies = computed(() => {
+  const map = new Map()
+  for (const s of showtimes.value) {
+    if (!map.has(s.movie_title)) {
+      map.set(s.movie_title, {
+        movieTitle: s.movie_title,
+        posterUrl: s.poster_url,
+        genre: s.genre,
+        durationMinutes: s.duration_minutes,
+        sessions: [],
+      })
+    }
+    map.get(s.movie_title).sessions.push({ id: s.id, hallName: s.Hall?.name, startTime: s.start_time })
+  }
+  return [...map.values()]
+})
 </script>
 
 <template>
-  <main class="mx-auto min-h-screen max-w-4xl px-6 py-12">
+  <main class="mx-auto min-h-screen max-w-3xl px-6 py-12">
     <p class="mb-2 text-xs tracking-[0.14em] text-accent">BOOKING TERMINAL</p>
     <h1 class="font-display mb-8 text-3xl font-extrabold uppercase text-ink">Showtimes</h1>
 
     <p v-if="loading" class="text-sm text-muted">Loading...</p>
-    <p v-else-if="showtimes.length === 0" class="text-sm text-muted">No showtimes yet. Check back soon.</p>
+    <p v-else-if="movies.length === 0" class="text-sm text-muted">No showtimes yet. Check back soon.</p>
 
     <div v-else>
-      <div class="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-border pb-3 text-[10.5px] uppercase tracking-wide text-muted sm:grid-cols-[1fr_70px_120px_50px]">
-        <span>Film</span>
-        <span class="hidden sm:block">Hall</span>
-        <span>Time</span>
-        <span></span>
-      </div>
-      <ShowtimeRow v-for="s in showtimes" :key="s.id" :showtime="s" />
+      <MovieGroup v-for="m in movies" :key="m.movieTitle" :movie="m" />
     </div>
   </main>
 </template>

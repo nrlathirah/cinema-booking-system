@@ -9,6 +9,7 @@ MenuItem.init(
     category: { type: DataTypes.STRING, allowNull: false },
     price: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
     is_combo: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    image_url: { type: DataTypes.STRING, allowNull: true },
   },
   {
     sequelize,

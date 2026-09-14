@@ -8,7 +8,15 @@ const loading = ref(true)
 const error = ref('')
 const saving = ref(false)
 
-const form = ref({ movieTitle: '', hallId: '', startTime: '', endTime: '' })
+const form = ref({
+  movieTitle: '',
+  hallId: '',
+  startTime: '',
+  endTime: '',
+  posterUrl: '',
+  genre: '',
+  durationMinutes: '',
+})
 
 async function load() {
   loading.value = true
@@ -23,7 +31,15 @@ async function createShowtime() {
   saving.value = true
   try {
     await api.post('/showtimes', form.value)
-    form.value = { movieTitle: '', hallId: '', startTime: '', endTime: '' }
+    form.value = {
+      movieTitle: '',
+      hallId: '',
+      startTime: '',
+      endTime: '',
+      posterUrl: '',
+      genre: '',
+      durationMinutes: '',
+    }
     await load()
   } catch (err) {
     error.value = err.response?.data?.message || 'failed to create showtime'
@@ -59,6 +75,23 @@ onMounted(load)
         required
         class="bg-transparent border border-border px-3 py-2 col-span-2"
       />
+      <input
+        v-model="form.posterUrl"
+        placeholder="Poster URL (optional)"
+        class="bg-transparent border border-border px-3 py-2 col-span-2"
+      />
+      <input
+        v-model="form.genre"
+        placeholder="Genre (optional)"
+        class="bg-transparent border border-border px-3 py-2"
+      />
+      <input
+        v-model.number="form.durationMinutes"
+        type="number"
+        min="1"
+        placeholder="Duration (min)"
+        class="bg-transparent border border-border px-3 py-2"
+      />
       <select
         v-model="form.hallId"
         required
@@ -92,6 +125,7 @@ onMounted(load)
     <table v-else class="w-full text-sm">
       <thead class="text-muted text-left">
         <tr>
+          <th class="pb-2"></th>
           <th class="pb-2">Movie</th>
           <th class="pb-2">Hall</th>
           <th class="pb-2">Start</th>
@@ -100,6 +134,11 @@ onMounted(load)
       </thead>
       <tbody>
         <tr v-for="s in showtimes" :key="s.id" class="border-t border-border">
+          <td class="py-2">
+            <div class="h-14 w-10 overflow-hidden border border-border bg-white/5">
+              <img v-if="s.poster_url" :src="s.poster_url" :alt="s.movie_title" class="h-full w-full object-cover" />
+            </div>
+          </td>
           <td class="py-2">{{ s.movie_title }}</td>
           <td class="py-2">{{ s.Hall?.name }}</td>
           <td class="py-2">{{ formatTime(s.start_time) }}</td>

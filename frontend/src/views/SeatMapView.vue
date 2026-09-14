@@ -105,10 +105,20 @@ onBeforeUnmount(() => {
         ← Back to showtimes
       </button>
 
-      <div v-if="showtime" class="mb-10">
-        <p class="text-xs tracking-[0.14em] text-accent">SELECT YOUR SEATS</p>
-        <h1 class="font-display text-2xl font-bold uppercase text-ink">{{ showtime.movie_title }}</h1>
-        <p class="text-xs text-muted">{{ showtime.Hall?.name }}</p>
+      <div v-if="showtime" class="mb-10 flex items-center gap-4">
+        <div class="h-36 w-24 flex-shrink-0 overflow-hidden border border-border bg-white/5">
+          <img
+            v-if="showtime.poster_url"
+            :src="showtime.poster_url"
+            :alt="showtime.movie_title"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.14em] text-accent">SELECT YOUR SEATS</p>
+          <h1 class="font-display text-2xl font-bold uppercase text-ink">{{ showtime.movie_title }}</h1>
+          <p class="text-xs text-muted">{{ showtime.Hall?.name }}</p>
+        </div>
       </div>
 
       <!-- Screen -->
