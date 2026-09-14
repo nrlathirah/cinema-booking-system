@@ -3,7 +3,9 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
+import { sequelize } from './models/index.js'
 import healthRoutes from './routes/health.js'
+import authRoutes from './routes/auth.js'
 import { registerSocketHandlers } from './sockets/index.js'
 
 dotenv.config()
@@ -18,11 +20,24 @@ app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }))
 app.use(express.json())
 
 app.use('/api', healthRoutes)
+app.use('/api/auth', authRoutes)
 
 registerSocketHandlers(io)
 
 const PORT = process.env.PORT || 5000
 
-httpServer.listen(PORT, () => {
-  console.log(`SeatFlow API listening on port ${PORT}`)
-})
+async function start() {
+  try {
+    await sequelize.authenticate()
+    await sequelize.sync({ alter: true })
+    console.log('database connected and synced')
+  } catch (err) {
+    console.error('database connection failed:', err.message)
+  }
+
+  httpServer.listen(PORT, () => {
+    console.log(`SeatFlow API listening on port ${PORT}`)
+  })
+}
+
+start()
