@@ -38,7 +38,10 @@ function formatTime(iso) {
             :key="b.id"
             class="border-t border-border transition-colors hover:bg-white/[0.02]"
           >
-            <td class="py-2">{{ b.User?.name }}</td>
+            <td class="py-2">
+              {{ b.User?.name || b.guest_name }}
+              <span v-if="!b.User" class="text-[10px] text-accent">GUEST</span>
+            </td>
             <td class="py-2">{{ b.Showtime?.movie_title }}</td>
             <td class="py-2">{{ b.Seat?.seat_row }}{{ b.Seat?.seat_number }}</td>
             <td class="py-2 whitespace-nowrap">{{ formatTime(b.createdAt) }}</td>

@@ -62,6 +62,7 @@ function handleLogout() {
 
         <template v-if="auth.isAuthenticated">
           <span class="hidden border-l border-border px-4 text-muted md:inline">{{ auth.user?.name }}</span>
+          <span class="hidden border-l border-border px-4 text-accent md:inline">{{ auth.user?.points ?? 0 }} PTS</span>
           <button
             @click="handleLogout"
             class="ml-4 hidden border border-border px-4 py-1.5 text-muted transition-colors hover:border-accent hover:text-accent sm:inline-block"
@@ -129,7 +130,10 @@ function handleLogout() {
       </router-link>
 
       <template v-if="auth.isAuthenticated">
-        <span class="border-b border-border px-6 py-3 text-muted">{{ auth.user?.name }}</span>
+        <span class="flex items-center justify-between border-b border-border px-6 py-3">
+          <span class="text-muted">{{ auth.user?.name }}</span>
+          <span class="text-accent">{{ auth.user?.points ?? 0 }} PTS</span>
+        </span>
         <button class="px-6 py-3 text-left text-muted hover:text-ink" @click="handleLogout">LOGOUT</button>
       </template>
       <template v-else>

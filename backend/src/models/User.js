@@ -24,6 +24,7 @@ User.init(
       allowNull: false,
       defaultValue: 'customer',
     },
+    points: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
   },
   {
     sequelize,

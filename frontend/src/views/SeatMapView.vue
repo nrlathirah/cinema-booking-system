@@ -49,10 +49,6 @@ function seatStatus(seat) {
 }
 
 function toggleSeat(seat) {
-  if (!auth.isAuthenticated) {
-    router.push('/login')
-    return
-  }
   const status = seatStatus(seat)
   if (status === 'taken' || status === 'locked') return
 
@@ -65,20 +61,32 @@ function toggleSeat(seat) {
   }
 }
 
-async function handlePaid() {
+async function handlePaid(payload) {
   showPayment.value = false
-  await confirmBooking()
+  await confirmBooking(payload)
 }
 
-async function confirmBooking() {
+async function confirmBooking({ guestName, guestEmail, redeemPoints } = {}) {
   error.value = ''
   confirming.value = true
   try {
-    const { data } = await api.post('/bookings', { showtimeId, seatIds: [...selected.value] })
+    const { data } = await api.post('/bookings', {
+      showtimeId,
+      seatIds: [...selected.value],
+      guestName,
+      guestEmail,
+      redeemPoints,
+    })
     const seatCount = selected.value.size
     selected.value.clear()
     const bookingId = data.bookings[0]?.id
-    toast.show(`✓ ${seatCount} seat${seatCount === 1 ? '' : 's'} booked`)
+
+    if (auth.isAuthenticated) {
+      await auth.refreshUser()
+      toast.show(`✓ ${seatCount} seat${seatCount === 1 ? '' : 's'} booked · +${data.pointsEarned} pts`)
+    } else {
+      toast.show(`✓ ${seatCount} seat${seatCount === 1 ? '' : 's'} booked`)
+    }
     router.push({ path: '/menu', query: bookingId ? { bookingId } : {} })
   } catch (err) {
     error.value = err.response?.data?.message || 'booking failed'

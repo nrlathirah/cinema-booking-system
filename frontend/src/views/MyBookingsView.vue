@@ -1,7 +1,9 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import api from '../services/api'
+import { useAuthStore } from '../stores/auth'
 
+const auth = useAuthStore()
 const bookings = ref([])
 const orders = ref([])
 const loading = ref(true)
@@ -24,7 +26,15 @@ function formatTime(iso) {
 <template>
   <main class="mx-auto min-h-screen max-w-3xl px-6 py-12">
     <p class="mb-2 text-xs tracking-[0.14em] text-accent">ACCOUNT</p>
-    <h1 class="font-display mb-8 text-3xl font-extrabold uppercase text-ink">My Bookings</h1>
+    <h1 class="font-display mb-6 text-3xl font-extrabold uppercase text-ink">My Bookings</h1>
+
+    <div class="hud-corners mb-10 flex items-center justify-between border border-border p-4">
+      <div>
+        <p class="text-xs text-muted">Reward points</p>
+        <p class="font-display text-2xl font-extrabold text-accent">{{ auth.user?.points ?? 0 }} pts</p>
+      </div>
+      <p class="max-w-[14rem] text-right text-[11px] text-muted">100 pts = RM 5 off your next checkout</p>
+    </div>
 
     <p v-if="loading" class="text-sm text-muted">Loading...</p>
 

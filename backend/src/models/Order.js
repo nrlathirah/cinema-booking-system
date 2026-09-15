@@ -5,7 +5,9 @@ class Order extends Model {}
 
 Order.init(
   {
-    user_id: { type: DataTypes.INTEGER, allowNull: false },
+    user_id: { type: DataTypes.INTEGER, allowNull: true },
+    guest_name: { type: DataTypes.STRING, allowNull: true },
+    guest_email: { type: DataTypes.STRING, allowNull: true },
     booking_id: { type: DataTypes.INTEGER, allowNull: true },
     status: {
       type: DataTypes.ENUM('confirmed', 'cancelled'),

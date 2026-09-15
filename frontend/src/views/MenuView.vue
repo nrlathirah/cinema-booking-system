@@ -34,28 +34,33 @@ function quantityOf(menuItemId) {
 }
 
 function startCheckout() {
-  if (!auth.isAuthenticated) {
-    router.push('/login')
-    return
-  }
   showPayment.value = true
 }
 
-async function handlePaid() {
+async function handlePaid(payload) {
   showPayment.value = false
-  await submitOrder()
+  await submitOrder(payload)
 }
 
-async function submitOrder() {
+async function submitOrder({ guestName, guestEmail, redeemPoints } = {}) {
   error.value = ''
   submitting.value = true
   try {
-    await api.post('/orders', {
+    const { data } = await api.post('/orders', {
       bookingId,
       items: cart.items.map((i) => ({ menuItemId: i.menuItemId, quantity: i.quantity })),
+      guestName,
+      guestEmail,
+      redeemPoints,
     })
     cart.clear()
-    toast.show('✓ Order placed — see you at the movies')
+
+    if (auth.isAuthenticated) {
+      await auth.refreshUser()
+      toast.show(`✓ Order placed · +${data.pointsEarned} pts`)
+    } else {
+      toast.show('✓ Order placed — see you at the movies')
+    }
     router.push('/')
   } catch (err) {
     error.value = err.response?.data?.message || 'order failed'

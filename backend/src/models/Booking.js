@@ -5,7 +5,9 @@ class Booking extends Model {}
 
 Booking.init(
   {
-    user_id: { type: DataTypes.INTEGER, allowNull: false },
+    user_id: { type: DataTypes.INTEGER, allowNull: true },
+    guest_name: { type: DataTypes.STRING, allowNull: true },
+    guest_email: { type: DataTypes.STRING, allowNull: true },
     showtime_id: { type: DataTypes.INTEGER, allowNull: false },
     seat_id: { type: DataTypes.INTEGER, allowNull: false },
     status: {

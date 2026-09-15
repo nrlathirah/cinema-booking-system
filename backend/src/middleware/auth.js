@@ -15,6 +15,21 @@ export function requireAuth(req, res, next) {
   }
 }
 
+export function optionalAuth(req, res, next) {
+  const header = req.headers.authorization
+  if (!header?.startsWith('Bearer ')) {
+    return next()
+  }
+
+  const token = header.slice(7)
+  try {
+    req.user = verifyToken(token)
+  } catch (err) {
+    // Invalid/expired token on an optional-auth route just means "not logged in".
+  }
+  next()
+}
+
 export function requireRole(...roles) {
   return (req, res, next) => {
     if (!roles.includes(req.user?.role)) {
