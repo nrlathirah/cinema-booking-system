@@ -46,6 +46,13 @@ function handleLogout() {
           <span v-if="cart.count > 0" class="bg-accent px-1.5 py-0.5 text-[10px] font-bold text-bg">{{ cart.count }}</span>
         </router-link>
         <router-link
+          v-if="auth.isAuthenticated"
+          to="/my-bookings"
+          class="hidden border-l border-border px-4 text-muted transition-colors hover:text-ink sm:inline"
+        >
+          MY BOOKINGS
+        </router-link>
+        <router-link
           v-if="auth.isAdmin"
           to="/admin"
           class="hidden border-l border-border px-4 text-accent transition-colors hover:text-accent-dim sm:inline"
@@ -105,6 +112,13 @@ function handleLogout() {
       >
         FOOD &amp; DRINKS
         <span v-if="cart.count > 0" class="bg-accent px-1.5 py-0.5 text-[10px] font-bold text-bg">{{ cart.count }}</span>
+      </router-link>
+      <router-link
+        v-if="auth.isAuthenticated"
+        to="/my-bookings"
+        class="border-b border-border px-6 py-3 text-muted hover:text-ink"
+      >
+        MY BOOKINGS
       </router-link>
       <router-link
         v-if="auth.isAdmin"

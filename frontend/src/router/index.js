@@ -5,6 +5,7 @@ import RegisterView from '../views/RegisterView.vue'
 import ShowtimesView from '../views/ShowtimesView.vue'
 import SeatMapView from '../views/SeatMapView.vue'
 import MenuView from '../views/MenuView.vue'
+import MyBookingsView from '../views/MyBookingsView.vue'
 import AdminLayout from '../views/admin/AdminLayout.vue'
 import AdminShowtimesView from '../views/admin/AdminShowtimesView.vue'
 import AdminHallsView from '../views/admin/AdminHallsView.vue'
@@ -49,6 +50,12 @@ const router = createRouter({
       component: MenuView,
     },
     {
+      path: '/my-bookings',
+      name: 'my-bookings',
+      component: MyBookingsView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/admin',
       component: AdminLayout,
       meta: { requiresAdmin: true },
@@ -71,10 +78,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  if (to.meta.requiresAdmin) {
-    const auth = useAuthStore()
-    if (!auth.isAdmin) return '/'
-  }
+  const auth = useAuthStore()
+  if (to.meta.requiresAdmin && !auth.isAdmin) return '/'
+  if (to.meta.requiresAuth && !auth.isAuthenticated) return '/login'
 })
 
 export default router

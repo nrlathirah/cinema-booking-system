@@ -36,6 +36,18 @@ export async function createBooking(req, res) {
   }
 }
 
+export async function listMyBookings(req, res) {
+  const bookings = await Booking.findAll({
+    where: { user_id: req.user.id },
+    include: [
+      { model: Showtime, attributes: ['id', 'movie_title', 'poster_url', 'start_time'] },
+      { model: Seat, attributes: ['id', 'seat_row', 'seat_number'] },
+    ],
+    order: [['createdAt', 'DESC']],
+  })
+  res.json({ bookings })
+}
+
 export async function listAllBookings(req, res) {
   const bookings = await Booking.findAll({
     include: [
