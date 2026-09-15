@@ -18,14 +18,24 @@ const seats = ref([])
 const selected = ref(new Set())
 const lockedByOthers = ref(new Set())
 const error = ref('')
+const loadError = ref('')
+const loading = ref(true)
 const confirming = ref(false)
 const showPayment = ref(false)
 const confirmed = ref(null)
 
 async function loadSeats() {
-  const { data } = await api.get(`/showtimes/${showtimeId}/seats`)
-  showtime.value = data.showtime
-  seats.value = data.seats
+  loadError.value = ''
+  try {
+    const { data } = await api.get(`/showtimes/${showtimeId}/seats`)
+    showtime.value = data.showtime
+    seats.value = data.seats
+  } catch (err) {
+    loadError.value = err.response?.data?.message || 'Failed to load this showtime'
+    toast.error(loadError.value)
+  } finally {
+    loading.value = false
+  }
 }
 
 const selectedSeatLabels = computed(() =>
@@ -85,9 +95,9 @@ async function confirmBooking({ guestName, guestEmail, redeemPoints } = {}) {
 
     if (auth.isAuthenticated) {
       await auth.refreshUser()
-      toast.show(`✓ Booking confirmed · +${data.pointsEarned} pts`)
+      toast.success(`✓ Booking confirmed · +${data.pointsEarned} pts`)
     } else {
-      toast.show('✓ Booking confirmed')
+      toast.success('✓ Booking confirmed')
     }
 
     confirmed.value = {
@@ -98,7 +108,8 @@ async function confirmBooking({ guestName, guestEmail, redeemPoints } = {}) {
       isGuest: !auth.isAuthenticated,
     }
   } catch (err) {
-    error.value = err.response?.data?.message || 'booking failed'
+    error.value = err.response?.data?.message || 'Booking failed. The seat may have just been taken — please pick another.'
+    toast.error(error.value)
     await loadSeats()
   } finally {
     confirming.value = false
@@ -114,6 +125,7 @@ function goToMenu() {
 
 onMounted(async () => {
   await loadSeats()
+  if (loadError.value) return
 
   socket.connect()
   socket.emit('showtime:join', showtimeId)
@@ -198,6 +210,10 @@ onBeforeUnmount(() => {
         ← Back to showtimes
       </button>
 
+      <p v-if="loading" class="text-sm text-muted">Loading seats...</p>
+      <p v-else-if="loadError" class="text-sm text-red-400">{{ loadError }}</p>
+
+      <template v-else>
       <div v-if="showtime" class="mb-10 flex items-center gap-4">
         <div class="h-36 w-24 flex-shrink-0 overflow-hidden border border-border bg-white/5">
           <img
@@ -265,10 +281,11 @@ onBeforeUnmount(() => {
         </span>
       </div>
 
-      <p v-if="error" class="mb-4 text-sm text-accent">{{ error }}</p>
+      <p v-if="error" class="mb-4 text-sm text-red-400">{{ error }}</p>
+      </template>
     </div>
 
-    <div class="fixed inset-x-0 bottom-0 border-t-2 border-border bg-bg/95 px-6 py-4 backdrop-blur">
+    <div v-if="!loading && !loadError" class="fixed inset-x-0 bottom-0 border-t-2 border-border bg-bg/95 px-6 py-4 backdrop-blur">
       <div class="mx-auto flex max-w-lg items-center justify-between gap-4">
         <div class="min-w-0">
           <p class="text-xs text-muted">{{ selected.size }} seat{{ selected.size === 1 ? '' : 's' }} selected</p>

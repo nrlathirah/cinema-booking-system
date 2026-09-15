@@ -1,14 +1,23 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import api from '../../services/api'
+import { useToastStore } from '../../stores/toast'
 
+const toast = useToastStore()
 const orders = ref([])
 const loading = ref(true)
+const loadError = ref('')
 
 onMounted(async () => {
-  const { data } = await api.get('/orders')
-  orders.value = data.orders
-  loading.value = false
+  try {
+    const { data } = await api.get('/orders')
+    orders.value = data.orders
+  } catch (err) {
+    loadError.value = err.response?.data?.message || 'Failed to load orders'
+    toast.error(loadError.value)
+  } finally {
+    loading.value = false
+  }
 })
 
 function formatTime(iso) {
@@ -21,6 +30,7 @@ function formatTime(iso) {
     <h1 class="text-xl font-display font-bold uppercase tracking-wide mb-4">All Orders</h1>
 
     <p v-if="loading" class="text-muted">Loading...</p>
+    <p v-else-if="loadError" class="text-sm text-red-400">{{ loadError }}</p>
     <p v-else-if="orders.length === 0" class="text-muted">No orders yet.</p>
     <div v-else class="space-y-3">
       <div v-for="o in orders" :key="o.id" class="border border-border p-3 text-sm transition-colors hover:bg-white/[0.02]">

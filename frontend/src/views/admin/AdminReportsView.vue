@@ -1,18 +1,27 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import api from '../../services/api'
+import { useToastStore } from '../../stores/toast'
 
+const toast = useToastStore()
 const loading = ref(true)
+const loadError = ref('')
 const totalBookings = ref(0)
 const seatUtilization = ref([])
 const mostOrderedItems = ref([])
 
 onMounted(async () => {
-  const { data } = await api.get('/reports/summary')
-  totalBookings.value = data.totalBookings
-  seatUtilization.value = data.seatUtilization
-  mostOrderedItems.value = data.mostOrderedItems
-  loading.value = false
+  try {
+    const { data } = await api.get('/reports/summary')
+    totalBookings.value = data.totalBookings
+    seatUtilization.value = data.seatUtilization
+    mostOrderedItems.value = data.mostOrderedItems
+  } catch (err) {
+    loadError.value = err.response?.data?.message || 'Failed to load reports'
+    toast.error(loadError.value)
+  } finally {
+    loading.value = false
+  }
 })
 
 const maxOrderedQuantity = () => Math.max(1, ...mostOrderedItems.value.map((i) => i.totalQuantity))
@@ -23,6 +32,7 @@ const maxOrderedQuantity = () => Math.max(1, ...mostOrderedItems.value.map((i) =
     <h1 class="text-xl font-display font-bold uppercase tracking-wide mb-6">Reports</h1>
 
     <p v-if="loading" class="text-muted">Loading...</p>
+    <p v-else-if="loadError" class="text-sm text-red-400">{{ loadError }}</p>
 
     <div v-else class="space-y-10">
       <!-- Headline stat tile -->

@@ -17,6 +17,7 @@ const bookingId = route.query.bookingId || null
 const movieTitle = route.query.movieTitle || null
 const items = ref([])
 const loading = ref(true)
+const loadError = ref('')
 const error = ref('')
 const submitting = ref(false)
 const showPayment = ref(false)
@@ -58,13 +59,14 @@ async function submitOrder({ guestName, guestEmail, redeemPoints } = {}) {
 
     if (auth.isAuthenticated) {
       await auth.refreshUser()
-      toast.show(`✓ Order placed · +${data.pointsEarned} pts`)
+      toast.success(`✓ Order placed · +${data.pointsEarned} pts`)
     } else {
-      toast.show('✓ Order placed — see you at the movies')
+      toast.success('✓ Order placed — see you at the movies')
     }
     router.push('/')
   } catch (err) {
-    error.value = err.response?.data?.message || 'order failed'
+    error.value = err.response?.data?.message || 'Order failed. Please try again.'
+    toast.error(error.value)
   } finally {
     submitting.value = false
   }
@@ -74,6 +76,9 @@ onMounted(async () => {
   try {
     const { data } = await api.get('/menu')
     items.value = data.items
+  } catch (err) {
+    loadError.value = err.response?.data?.message || 'Failed to load the menu'
+    toast.error(loadError.value)
   } finally {
     loading.value = false
   }
@@ -91,6 +96,7 @@ onMounted(async () => {
       <p v-else class="mb-8 text-xs text-muted">Order F&amp;B on its own</p>
 
       <p v-if="loading" class="text-sm text-muted">Loading menu...</p>
+      <p v-else-if="loadError" class="text-sm text-red-400">{{ loadError }}</p>
 
       <div v-else class="space-y-10">
         <div v-for="(group, category) in grouped" :key="category">

@@ -26,11 +26,55 @@ const displayAmount = computed(() =>
   redeemPoints.value ? Math.max(0, props.amount - REDEEM_DISCOUNT_RM) : props.amount,
 )
 const isValidEmail = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail.value.trim()))
-const canPay = computed(
+const guestOk = computed(
   () => auth.isAuthenticated || (guestName.value.trim().length > 0 && isValidEmail.value),
 )
 
+const guestTouched = ref(false)
+const guestNameError = computed(() => {
+  if (!guestTouched.value || auth.isAuthenticated) return ''
+  return guestName.value.trim() ? '' : 'Name is required'
+})
+const guestEmailError = computed(() => {
+  if (auth.isAuthenticated) return ''
+  if (!guestEmail.value.trim()) return guestTouched.value ? 'Email is required' : ''
+  return isValidEmail.value ? '' : 'Enter a valid email'
+})
+
+const cardDigits = computed(() => cardNumber.value.replace(/\s+/g, ''))
+const isValidCardNumber = computed(() => /^\d{13,19}$/.test(cardDigits.value))
+const isValidExpiry = computed(() => {
+  const match = /^(\d{2})\/(\d{2})$/.exec(expiry.value.trim())
+  if (!match) return false
+  const month = Number(match[1])
+  const year = 2000 + Number(match[2])
+  if (month < 1 || month > 12) return false
+  const expiryDate = new Date(year, month, 1)
+  return expiryDate > new Date()
+})
+const isValidCvv = computed(() => /^\d{3,4}$/.test(cvv.value.trim()))
+
+const cardTouched = ref(false)
+const cardNumberError = computed(() => {
+  if (!cardTouched.value) return ''
+  return isValidCardNumber.value ? '' : 'Enter a valid card number'
+})
+const expiryError = computed(() => {
+  if (!cardTouched.value) return ''
+  return isValidExpiry.value ? '' : 'Invalid or expired date'
+})
+const cvvError = computed(() => {
+  if (!cardTouched.value) return ''
+  return isValidCvv.value ? '' : 'Invalid CVV'
+})
+
+const canPay = computed(
+  () => guestOk.value && isValidCardNumber.value && isValidExpiry.value && isValidCvv.value,
+)
+
 async function pay() {
+  cardTouched.value = true
+  guestTouched.value = true
   if (!canPay.value) return
   processing.value = true
   await new Promise((resolve) => setTimeout(resolve, 1400))
@@ -61,18 +105,25 @@ async function pay() {
 
       <div v-if="!auth.isAuthenticated" class="mb-4 space-y-3 border border-border p-3">
         <p class="text-[11px] uppercase tracking-wide text-muted">Booking as guest</p>
-        <input
-          v-model="guestName"
-          placeholder="Full name"
-          class="w-full border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
-        />
-        <input
-          v-model="guestEmail"
-          type="email"
-          placeholder="Email"
-          class="w-full border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
-        />
-        <p v-if="guestEmail.trim() && !isValidEmail" class="text-xs text-red-400">Enter a valid email</p>
+        <div>
+          <input
+            v-model="guestName"
+            placeholder="Full name"
+            class="w-full border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-none"
+            :class="guestNameError ? 'border-red-400 focus:border-red-400' : 'border-border focus:border-accent'"
+          />
+          <p v-if="guestNameError" class="mt-1 text-xs text-red-400">{{ guestNameError }}</p>
+        </div>
+        <div>
+          <input
+            v-model="guestEmail"
+            type="email"
+            placeholder="Email"
+            class="w-full border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-none"
+            :class="guestEmailError ? 'border-red-400 focus:border-red-400' : 'border-border focus:border-accent'"
+          />
+          <p v-if="guestEmailError" class="mt-1 text-xs text-red-400">{{ guestEmailError }}</p>
+        </div>
         <router-link to="/login" class="block text-xs text-accent hover:text-accent-dim" @click="emit('close')">
           Log in instead to earn points →
         </router-link>
@@ -88,27 +139,44 @@ async function pay() {
       </label>
 
       <div class="space-y-3">
-        <input
-          v-model="cardNumber"
-          placeholder="Card number"
-          class="w-full border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
-        />
+        <div>
+          <input
+            v-model="cardNumber"
+            placeholder="Card number"
+            inputmode="numeric"
+            maxlength="23"
+            class="w-full border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-none"
+            :class="cardNumberError ? 'border-red-400 focus:border-red-400' : 'border-border focus:border-accent'"
+          />
+          <p v-if="cardNumberError" class="mt-1 text-xs text-red-400">{{ cardNumberError }}</p>
+        </div>
         <div class="flex gap-3">
-          <input
-            v-model="expiry"
-            placeholder="MM/YY"
-            class="w-1/2 border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
-          />
-          <input
-            v-model="cvv"
-            placeholder="CVV"
-            class="w-1/2 border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
-          />
+          <div class="w-1/2">
+            <input
+              v-model="expiry"
+              placeholder="MM/YY"
+              maxlength="5"
+              class="w-full border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-none"
+              :class="expiryError ? 'border-red-400 focus:border-red-400' : 'border-border focus:border-accent'"
+            />
+            <p v-if="expiryError" class="mt-1 text-xs text-red-400">{{ expiryError }}</p>
+          </div>
+          <div class="w-1/2">
+            <input
+              v-model="cvv"
+              placeholder="CVV"
+              inputmode="numeric"
+              maxlength="4"
+              class="w-full border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-none"
+              :class="cvvError ? 'border-red-400 focus:border-red-400' : 'border-border focus:border-accent'"
+            />
+            <p v-if="cvvError" class="mt-1 text-xs text-red-400">{{ cvvError }}</p>
+          </div>
         </div>
       </div>
 
       <button
-        :disabled="processing || !canPay"
+        :disabled="processing"
         class="mt-6 w-full bg-accent py-3 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim disabled:cursor-not-allowed disabled:opacity-60"
         @click="pay"
       >

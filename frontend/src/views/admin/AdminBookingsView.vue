@@ -1,14 +1,23 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import api from '../../services/api'
+import { useToastStore } from '../../stores/toast'
 
+const toast = useToastStore()
 const bookings = ref([])
 const loading = ref(true)
+const loadError = ref('')
 
 onMounted(async () => {
-  const { data } = await api.get('/bookings')
-  bookings.value = data.bookings
-  loading.value = false
+  try {
+    const { data } = await api.get('/bookings')
+    bookings.value = data.bookings
+  } catch (err) {
+    loadError.value = err.response?.data?.message || 'Failed to load bookings'
+    toast.error(loadError.value)
+  } finally {
+    loading.value = false
+  }
 })
 
 function formatTime(iso) {
@@ -21,6 +30,7 @@ function formatTime(iso) {
     <h1 class="text-xl font-display font-bold uppercase tracking-wide mb-4">All Bookings</h1>
 
     <p v-if="loading" class="text-muted">Loading...</p>
+    <p v-else-if="loadError" class="text-sm text-red-400">{{ loadError }}</p>
     <p v-else-if="bookings.length === 0" class="text-muted">No bookings yet.</p>
     <div v-else class="overflow-x-auto">
       <table class="w-full min-w-[420px] text-sm">
