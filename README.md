@@ -1,4 +1,4 @@
-# SeatFlow
+# Kinora
 
 [![CI](https://github.com/nrlathirah/cinema-booking-system/actions/workflows/ci.yml/badge.svg)](https://github.com/nrlathirah/cinema-booking-system/actions/workflows/ci.yml)
 
@@ -32,9 +32,12 @@ I verified this directly by firing 5 simultaneous booking requests for the same 
 ## Features
 
 - **Auth** — register/login (JWT + bcrypt), `admin` / `customer` roles
-- **Seat booking** — showtime listing, interactive seat map, live seat locking over Socket.io, transactional booking with a DB-level uniqueness guarantee
+- **Real movie data** — showtimes are backed by [TMDB](https://www.themoviedb.org/) (real poster, backdrop, genre, runtime), with a graceful placeholder fallback when no API key is set
+- **Seat booking** — poster-grid showtime browser, interactive seat map with priced standard/premium seats, live seat locking over Socket.io, transactional booking with a DB-level uniqueness guarantee
 - **F&B ordering** — browse menu by category, cart, checkout, optional bundling with a seat booking
-- **Admin panel** — manage halls (seat layout is generated automatically from rows × seats-per-row), showtimes, and menu items; view all bookings and orders across all customers
+- **Mock checkout** — a dummy payment step (pre-filled fake card, simulated processing delay) in front of both seat and F&B checkout; this is a portfolio project, so no real payment gateway is wired up
+- **My Bookings** — logged-in customers can see their past seat bookings and F&B orders
+- **Admin panel** — manage halls (seat layout is generated automatically from rows × seats-per-row), showtimes, and menu items; view all bookings/orders and a reporting dashboard (seat utilization, most-ordered items)
 - **CI** — GitHub Actions runs the test suite and a production build on every push/PR to `main`
 
 ## Tech stack
@@ -44,6 +47,7 @@ I verified this directly by firing 5 simultaneous booking requests for the same 
 | Frontend | Vue 3 (Composition API), Pinia, Vue Router, Tailwind CSS, Socket.io-client |
 | Backend | Node.js, Express, Socket.io, Sequelize, JWT, bcrypt |
 | Database | PostgreSQL (Neon) |
+| Movie data | [TMDB API](https://www.themoviedb.org/) |
 | Testing | Vitest |
 | CI | GitHub Actions |
 
@@ -75,13 +79,13 @@ Requires a PostgreSQL database (this project uses a free [Neon](https://neon.com
 
 ```sh
 cd backend
-cp .env.example .env   # fill in DATABASE_URL and JWT_SECRET
+cp .env.example .env   # fill in DATABASE_URL, JWT_SECRET, and (optionally) TMDB_API_KEY
 npm install
-npm run seed            # creates a hall + seats, sample showtimes, menu items, and an admin account
+npm run seed            # creates a hall + seats, a real-movie catalog, menu items, and an admin account
 npm run dev
 ```
 
-The seed script also creates an admin account (`admin@seatflow.test` / `admin12345`) so you can access `/admin` right away.
+The seed script also creates an admin account (`admin@kinora.test` / `admin12345`) so you can access `/admin` right away. Without a [TMDB API key](https://www.themoviedb.org/settings/api) the seeded showtimes fall back to placeholder posters — everything still works, just without real movie art.
 
 ### Frontend
 
@@ -103,6 +107,6 @@ npm test
 ## What I'd do next
 
 - Cancellation flow for bookings/orders (the unique constraint is currently permanent — no seat can be re-booked after a cancellation, since that flow doesn't exist yet)
-- Payment integration (currently all bookings/orders confirm instantly with no payment step)
+- A real payment gateway (the current checkout is an intentional dummy step — see [Features](#features))
 - Move the in-memory seat-lock map to Redis so it survives a backend restart and works across multiple server instances
 - Deploy: frontend to Netlify/Vercel, backend to Render, both wired to auto-deploy on merge to `main`

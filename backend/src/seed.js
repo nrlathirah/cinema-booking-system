@@ -7,7 +7,7 @@ import { fetchMovieFromTMDB } from './utils/tmdb.js'
 
 const { Hall, Seat, Showtime, MenuItem, User } = models
 
-const ADMIN_EMAIL = 'admin@seatflow.test'
+const ADMIN_EMAIL = 'admin@kinora.test'
 const ADMIN_PASSWORD = 'admin12345'
 
 const ROWS = ['A', 'B', 'C', 'D', 'E']
@@ -192,6 +192,12 @@ async function seed() {
   }
   if (menuItemsMissingImage.length > 0) {
     console.log(`backfilled image_url for ${menuItemsMissingImage.length} menu item(s)`)
+  }
+
+  const oldAdmin = await User.findOne({ where: { email: 'admin@seatflow.test' } })
+  if (oldAdmin) {
+    await oldAdmin.update({ email: ADMIN_EMAIL })
+    console.log(`renamed admin email to ${ADMIN_EMAIL}`)
   }
 
   const existingAdmin = await User.findOne({ where: { email: ADMIN_EMAIL } })

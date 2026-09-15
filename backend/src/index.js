@@ -50,7 +50,7 @@ async function start() {
   }
 
   httpServer.listen(PORT, () => {
-    console.log(`SeatFlow API listening on port ${PORT}`)
+    console.log(`Kinora API listening on port ${PORT}`)
   })
 }
 

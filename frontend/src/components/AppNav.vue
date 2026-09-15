@@ -28,7 +28,7 @@ function handleLogout() {
   <header class="sticky top-0 z-40 border-b-2 border-border bg-bg/95 backdrop-blur">
     <nav class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4 font-mono">
       <router-link to="/" class="font-display text-[17px] font-extrabold tracking-wide text-ink">
-        SEATFLOW
+        KINORA
       </router-link>
 
       <div class="flex items-center gap-0 text-xs">
