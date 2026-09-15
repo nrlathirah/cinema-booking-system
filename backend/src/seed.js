@@ -83,34 +83,39 @@ async function seed() {
   }
 
   const MOVIES = [
-    { title: 'Dune: Part Two', genre: 'Sci-Fi', duration: 166, startHours: [2, 7] },
-    { title: 'The Batman', genre: 'Action', duration: 176, startHours: [3] },
+    { title: 'Dune: Part Two', genre: 'Sci-Fi', duration: 166, startHours: [1, 4, 7, 10] },
+    { title: 'The Batman', genre: 'Action', duration: 176, startHours: [2, 5, 8, 11] },
     {
       title: 'The Lord of the Rings: The Fellowship of the Ring',
       genre: 'Fantasy',
       duration: 178,
-      startHours: [1, 6],
+      startHours: [1, 5, 9],
     },
     {
       title: 'The Lord of the Rings: The Two Towers',
       genre: 'Fantasy',
       duration: 179,
-      startHours: [2, 8],
+      startHours: [2, 6, 10],
     },
     {
       title: 'The Lord of the Rings: The Return of the King',
       genre: 'Fantasy',
       duration: 201,
-      startHours: [3, 9],
+      startHours: [3, 7, 11],
     },
-    { title: 'Spider-Man: Across the Spider-Verse', genre: 'Animation', duration: 140, startHours: [4] },
-    { title: 'Mission: Impossible - Dead Reckoning Part One', genre: 'Action', duration: 163, startHours: [5] },
-    { title: 'The Grand Budapest Hotel', genre: 'Comedy', duration: 100, startHours: [2] },
-    { title: 'Oppenheimer', genre: 'Drama', duration: 180, startHours: [8] },
-    { title: 'Avatar: The Way of Water', genre: 'Sci-Fi', duration: 192, startHours: [9] },
-    { title: 'John Wick: Chapter 4', genre: 'Action', duration: 169, startHours: [10] },
-    { title: 'Everything Everywhere All at Once', genre: 'Sci-Fi', duration: 139, startHours: [11] },
-    { title: 'Past Lives', genre: 'Drama', duration: 105, startHours: [3] },
+    { title: 'Spider-Man: Across the Spider-Verse', genre: 'Animation', duration: 140, startHours: [1, 4, 7, 10] },
+    {
+      title: 'Mission: Impossible - Dead Reckoning Part One',
+      genre: 'Action',
+      duration: 163,
+      startHours: [2, 5, 8],
+    },
+    { title: 'The Grand Budapest Hotel', genre: 'Comedy', duration: 100, startHours: [1, 3, 6, 9] },
+    { title: 'Oppenheimer', genre: 'Drama', duration: 180, startHours: [2, 6, 10] },
+    { title: 'Avatar: The Way of Water', genre: 'Sci-Fi', duration: 192, startHours: [1, 5, 9] },
+    { title: 'John Wick: Chapter 4', genre: 'Action', duration: 169, startHours: [3, 7, 11] },
+    { title: 'Everything Everywhere All at Once', genre: 'Sci-Fi', duration: 139, startHours: [2, 4, 8] },
+    { title: 'Past Lives', genre: 'Drama', duration: 105, startHours: [1, 6, 10] },
   ]
 
   let addedSessions = 0
@@ -123,11 +128,22 @@ async function seed() {
     const backdropUrl = tmdbData?.backdropUrl || posterUrl
     const genre = tmdbData?.genre || movie.genre
     const duration = tmdbData?.durationMinutes || movie.duration
+    const overview = tmdbData?.overview || null
 
-    const alreadyExists = await Showtime.count({ where: { movie_title: movie.title } })
-    if (alreadyExists === 0) {
+    // Refresh metadata on any sessions already seeded for this movie.
+    await Showtime.update(
+      { poster_url: posterUrl, backdrop_url: backdropUrl, genre, duration_minutes: duration, overview },
+      { where: { movie_title: movie.title } },
+    )
+
+    // Top up sessions rather than skip/recreate: existing rows may already be
+    // referenced by bookings, so they're never deleted — only new time slots
+    // beyond what's already seeded get added.
+    const existingCount = await Showtime.count({ where: { movie_title: movie.title } })
+    const missingHours = movie.startHours.slice(existingCount)
+    if (missingHours.length > 0) {
       const now = new Date()
-      const rows = movie.startHours.map((hours) => {
+      const rows = missingHours.map((hours) => {
         const start = new Date(now.getTime() + hours * 60 * 60 * 1000)
         const end = new Date(start.getTime() + duration * 60 * 1000)
         return {
@@ -136,6 +152,7 @@ async function seed() {
           poster_url: posterUrl,
           backdrop_url: backdropUrl,
           genre,
+          overview,
           duration_minutes: duration,
           start_time: start,
           end_time: end,
@@ -143,12 +160,6 @@ async function seed() {
       })
       await Showtime.bulkCreate(rows)
       addedSessions += rows.length
-    } else {
-      // Refresh existing sessions in case a TMDB key was added after the first seed run.
-      await Showtime.update(
-        { poster_url: posterUrl, backdrop_url: backdropUrl, genre, duration_minutes: duration },
-        { where: { movie_title: movie.title } },
-      )
     }
   }
   console.log(

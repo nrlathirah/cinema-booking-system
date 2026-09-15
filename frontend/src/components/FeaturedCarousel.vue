@@ -47,9 +47,8 @@ function formatDuration(mins) {
   return `${h}h ${m}m`
 }
 
-function goToSeats(movie) {
-  const firstSession = movie.sessions[0]
-  if (firstSession) router.push(`/showtimes/${firstSession.id}/seats`)
+function goToDetail(movie) {
+  router.push(`/movies/${encodeURIComponent(movie.movieTitle)}`)
 }
 </script>
 
@@ -88,9 +87,9 @@ function goToSeats(movie) {
           </p>
           <button
             class="mt-4 bg-accent px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim"
-            @click="goToSeats(m)"
+            @click="goToDetail(m)"
           >
-            Select seats →
+            View showtimes →
           </button>
         </div>
       </div>

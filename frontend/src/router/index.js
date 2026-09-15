@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import ShowtimesView from '../views/ShowtimesView.vue'
+import MovieDetailView from '../views/MovieDetailView.vue'
 import SeatMapView from '../views/SeatMapView.vue'
 import MenuView from '../views/MenuView.vue'
 import MyBookingsView from '../views/MyBookingsView.vue'
@@ -38,6 +39,11 @@ const router = createRouter({
       path: '/showtimes',
       name: 'showtimes',
       component: ShowtimesView,
+    },
+    {
+      path: '/movies/:title',
+      name: 'movie-detail',
+      component: MovieDetailView,
     },
     {
       path: '/showtimes/:id/seats',

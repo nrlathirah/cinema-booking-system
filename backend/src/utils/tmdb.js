@@ -23,6 +23,7 @@ export async function fetchMovieFromTMDB(title) {
       backdropUrl: match.backdrop_path ? `${TMDB_BACKDROP_BASE}${match.backdrop_path}` : null,
       durationMinutes: details.runtime || null,
       genre: details.genres?.[0]?.name || null,
+      overview: match.overview || null,
     }
   } catch (err) {
     console.warn(`TMDB lookup failed for "${title}":`, err.message)

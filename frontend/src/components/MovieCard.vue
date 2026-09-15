@@ -6,10 +6,6 @@ const props = defineProps({
 })
 const router = useRouter()
 
-function formatTime(iso) {
-  return new Date(iso).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })
-}
-
 function formatDuration(mins) {
   if (!mins) return null
   const h = Math.floor(mins / 60)
@@ -19,7 +15,7 @@ function formatDuration(mins) {
 </script>
 
 <template>
-  <div class="group">
+  <button class="group block w-full text-left" @click="router.push(`/movies/${encodeURIComponent(movie.movieTitle)}`)">
     <div class="relative aspect-[2/3] overflow-hidden border border-border bg-white/5">
       <img
         v-if="movie.posterUrl"
@@ -42,16 +38,8 @@ function formatDuration(mins) {
       <span v-if="movie.genre && movie.durationMinutes"> · </span>
       <span v-if="movie.durationMinutes">{{ formatDuration(movie.durationMinutes) }}</span>
     </p>
-
-    <div class="mt-2.5 flex flex-wrap gap-1.5">
-      <button
-        v-for="s in movie.sessions"
-        :key="s.id"
-        class="border border-border px-2 py-1 text-[10.5px] text-muted transition-all duration-150 hover:border-accent hover:text-accent active:scale-95"
-        @click="router.push(`/showtimes/${s.id}/seats`)"
-      >
-        {{ formatTime(s.startTime) }}
-      </button>
-    </div>
-  </div>
+    <p class="mt-1 text-xs text-accent">
+      {{ movie.sessions.length }} showtime{{ movie.sessions.length === 1 ? '' : 's' }} →
+    </p>
+  </button>
 </template>
