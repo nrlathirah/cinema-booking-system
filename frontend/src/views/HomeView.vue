@@ -38,6 +38,12 @@ const movies = computed(() => {
 })
 
 const featuredMovies = computed(() => movies.value.slice(0, 5))
+// Show different movies than the carousel above; fall back to the front of
+// the list if the catalog isn't big enough to have a distinct set.
+const nowShowingMovies = computed(() => {
+  const rest = movies.value.slice(5, 9)
+  return rest.length > 0 ? rest : movies.value.slice(0, 4)
+})
 const movieCount = computed(() => movies.value.length)
 const sessionCount = computed(() => showtimes.value.length)
 
@@ -110,7 +116,7 @@ const steps = [
         <SkeletonCard v-for="n in 4" :key="n" />
       </div>
       <div v-else-if="movies.length > 0" class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4">
-        <MovieCard v-for="m in movies.slice(0, 4)" :key="m.movieTitle" :movie="m" />
+        <MovieCard v-for="m in nowShowingMovies" :key="m.movieTitle" :movie="m" />
       </div>
       <p v-else class="py-6 text-sm text-muted">No showtimes yet. Check back soon.</p>
     </section>

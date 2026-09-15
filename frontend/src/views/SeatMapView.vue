@@ -20,6 +20,7 @@ const lockedByOthers = ref(new Set())
 const error = ref('')
 const confirming = ref(false)
 const showPayment = ref(false)
+const confirmed = ref(null)
 
 async function loadSeats() {
   const { data } = await api.get(`/showtimes/${showtimeId}/seats`)
@@ -77,23 +78,38 @@ async function confirmBooking({ guestName, guestEmail, redeemPoints } = {}) {
       guestEmail,
       redeemPoints,
     })
-    const seatCount = selected.value.size
+    const seatLabels = selectedSeatLabels.value
+    const total = totalAmount.value
     selected.value.clear()
     const bookingId = data.bookings[0]?.id
 
     if (auth.isAuthenticated) {
       await auth.refreshUser()
-      toast.show(`✓ ${seatCount} seat${seatCount === 1 ? '' : 's'} booked · +${data.pointsEarned} pts`)
+      toast.show(`✓ Booking confirmed · +${data.pointsEarned} pts`)
     } else {
-      toast.show(`✓ ${seatCount} seat${seatCount === 1 ? '' : 's'} booked`)
+      toast.show('✓ Booking confirmed')
     }
-    router.push({ path: '/menu', query: bookingId ? { bookingId } : {} })
+
+    confirmed.value = {
+      bookingId,
+      seatLabels,
+      total,
+      pointsEarned: data.pointsEarned,
+      isGuest: !auth.isAuthenticated,
+    }
   } catch (err) {
     error.value = err.response?.data?.message || 'booking failed'
     await loadSeats()
   } finally {
     confirming.value = false
   }
+}
+
+function goToMenu() {
+  router.push({
+    path: '/menu',
+    query: { bookingId: confirmed.value.bookingId, movieTitle: showtime.value?.movie_title },
+  })
 }
 
 onMounted(async () => {
@@ -132,7 +148,51 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="min-h-screen px-6 py-8 pb-32">
+  <main v-if="confirmed" class="flex min-h-screen items-center justify-center px-6 py-16">
+    <div class="hud-corners w-full max-w-md border border-border p-6">
+      <p class="mb-2 text-xs tracking-[0.14em] text-accent">✓ BOOKING CONFIRMED</p>
+      <h1 class="font-display mb-1 text-2xl font-bold uppercase text-ink">{{ showtime?.movie_title }}</h1>
+      <p class="mb-6 text-xs text-muted">{{ showtime?.Hall?.name }}</p>
+
+      <div class="space-y-2 border-y border-dashed border-border py-4 text-sm">
+        <div class="flex justify-between">
+          <span class="text-muted">Seats</span>
+          <span class="font-display font-bold text-accent">{{ confirmed.seatLabels }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-muted">Total paid</span>
+          <span class="text-ink">RM {{ confirmed.total.toFixed(2) }}</span>
+        </div>
+        <div v-if="!confirmed.isGuest" class="flex justify-between">
+          <span class="text-muted">Points earned</span>
+          <span class="text-accent">+{{ confirmed.pointsEarned }} pts</span>
+        </div>
+      </div>
+
+      <p v-if="confirmed.isGuest" class="mt-4 text-xs text-muted">
+        Booked as a guest — this confirmation is your only record.
+        <router-link to="/register" class="text-accent hover:text-accent-dim">Create an account</router-link>
+        to save bookings and earn points next time.
+      </p>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button
+          class="bg-accent px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim"
+          @click="goToMenu"
+        >
+          Add food &amp; drinks →
+        </button>
+        <router-link
+          to="/"
+          class="border border-border px-5 py-2.5 text-xs uppercase tracking-wide text-muted transition-colors hover:border-accent hover:text-accent"
+        >
+          Done
+        </router-link>
+      </div>
+    </div>
+  </main>
+
+  <main v-else class="min-h-screen px-6 py-8 pb-32">
     <div class="mx-auto max-w-lg">
       <button class="mb-4 text-xs text-muted transition-colors hover:text-ink" @click="router.push('/showtimes')">
         ← Back to showtimes

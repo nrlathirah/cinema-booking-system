@@ -25,7 +25,10 @@ const canRedeem = computed(() => auth.isAuthenticated && (auth.user?.points || 0
 const displayAmount = computed(() =>
   redeemPoints.value ? Math.max(0, props.amount - REDEEM_DISCOUNT_RM) : props.amount,
 )
-const canPay = computed(() => auth.isAuthenticated || (guestName.value.trim() && guestEmail.value.trim()))
+const isValidEmail = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail.value.trim()))
+const canPay = computed(
+  () => auth.isAuthenticated || (guestName.value.trim().length > 0 && isValidEmail.value),
+)
 
 async function pay() {
   if (!canPay.value) return
@@ -69,6 +72,7 @@ async function pay() {
           placeholder="Email"
           class="w-full border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none"
         />
+        <p v-if="guestEmail.trim() && !isValidEmail" class="text-xs text-red-400">Enter a valid email</p>
         <router-link to="/login" class="block text-xs text-accent hover:text-accent-dim" @click="emit('close')">
           Log in instead to earn points →
         </router-link>

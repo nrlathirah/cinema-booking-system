@@ -14,6 +14,7 @@ const cart = useCartStore()
 const toast = useToastStore()
 
 const bookingId = route.query.bookingId || null
+const movieTitle = route.query.movieTitle || null
 const items = ref([])
 const loading = ref(true)
 const error = ref('')
@@ -84,7 +85,9 @@ onMounted(async () => {
     <div class="mx-auto max-w-4xl">
       <p class="mb-2 text-xs tracking-[0.14em] text-accent">CONCESSIONS MANIFEST</p>
       <h1 class="font-display mb-1 text-3xl font-extrabold uppercase text-ink">Food &amp; Beverages</h1>
-      <p v-if="bookingId" class="mb-8 text-xs text-accent">Bundling with seat booking #{{ bookingId }}</p>
+      <p v-if="bookingId" class="mb-8 text-xs text-accent">
+        Bundling with your <template v-if="movieTitle">{{ movieTitle }} </template>booking
+      </p>
       <p v-else class="mb-8 text-xs text-muted">Order F&amp;B on its own</p>
 
       <p v-if="loading" class="text-sm text-muted">Loading menu...</p>
