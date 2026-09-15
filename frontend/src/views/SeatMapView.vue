@@ -5,6 +5,7 @@ import api from '../services/api'
 import socket from '../services/socket'
 import { useAuthStore } from '../stores/auth'
 import { useToastStore } from '../stores/toast'
+import PaymentModal from '../components/PaymentModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -18,6 +19,7 @@ const selected = ref(new Set())
 const lockedByOthers = ref(new Set())
 const error = ref('')
 const confirming = ref(false)
+const showPayment = ref(false)
 
 async function loadSeats() {
   const { data } = await api.get(`/showtimes/${showtimeId}/seats`)
@@ -31,6 +33,13 @@ const selectedSeatLabels = computed(() =>
     .map((seat) => `${seat.seat_row}${seat.seat_number}`)
     .join(' · '),
 )
+
+const totalAmount = computed(() =>
+  seats.value.filter((seat) => selected.value.has(seat.id)).reduce((sum, seat) => sum + Number(seat.price), 0),
+)
+
+const standardPrice = computed(() => seats.value.find((s) => s.type === 'standard')?.price)
+const premiumPrice = computed(() => seats.value.find((s) => s.type === 'premium')?.price)
 
 function seatStatus(seat) {
   if (seat.status === 'taken') return 'taken'
@@ -54,6 +63,11 @@ function toggleSeat(seat) {
     socket.emit('seat:select', { showtimeId, seatId: seat.id })
     selected.value.add(seat.id)
   }
+}
+
+async function handlePaid() {
+  showPayment.value = false
+  await confirmBooking()
 }
 
 async function confirmBooking() {
@@ -165,10 +179,12 @@ onBeforeUnmount(() => {
 
       <div class="mb-6 flex flex-wrap gap-4 text-xs text-muted">
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-3 w-3 border border-border"></span> Available
+          <span class="inline-block h-3 w-3 border border-border"></span>
+          Available<template v-if="standardPrice"> (RM {{ Number(standardPrice).toFixed(0) }})</template>
         </span>
         <span class="flex items-center gap-1.5">
-          <span class="inline-block h-3 w-3 border border-accent-dim/50 text-accent-dim"></span> Premium
+          <span class="inline-block h-3 w-3 border border-accent-dim/50 text-accent-dim"></span>
+          Premium<template v-if="premiumPrice"> (RM {{ Number(premiumPrice).toFixed(0) }})</template>
         </span>
         <span class="flex items-center gap-1.5">
           <span class="inline-block h-3 w-3 bg-accent"></span> Selected
@@ -194,12 +210,14 @@ onBeforeUnmount(() => {
         </div>
         <button
           :disabled="selected.size === 0 || confirming"
-          @click="confirmBooking"
+          @click="showPayment = true"
           class="bg-accent px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim disabled:cursor-not-allowed disabled:opacity-30"
         >
-          {{ confirming ? 'Booking...' : 'Confirm booking →' }}
+          {{ confirming ? 'Booking...' : `Checkout · RM ${totalAmount.toFixed(2)} →` }}
         </button>
       </div>
     </div>
+
+    <PaymentModal v-if="showPayment" :amount="totalAmount" @close="showPayment = false" @paid="handlePaid" />
   </main>
 </template>

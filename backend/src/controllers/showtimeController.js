@@ -35,6 +35,7 @@ export async function getShowtimeSeats(req, res) {
       seat_row: seat.seat_row,
       seat_number: seat.seat_number,
       type: seat.type,
+      price: seat.price,
       status: takenSeatIds.has(seat.id) ? 'taken' : 'available',
     })),
   })

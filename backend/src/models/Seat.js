@@ -13,6 +13,7 @@ Seat.init(
       allowNull: false,
       defaultValue: 'standard',
     },
+    price: { type: DataTypes.DECIMAL(10, 2), allowNull: false, defaultValue: 15.0 },
   },
   {
     sequelize,

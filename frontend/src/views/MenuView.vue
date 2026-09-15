@@ -5,6 +5,7 @@ import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 import { useCartStore } from '../stores/cart'
 import { useToastStore } from '../stores/toast'
+import PaymentModal from '../components/PaymentModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -17,6 +18,7 @@ const items = ref([])
 const loading = ref(true)
 const error = ref('')
 const submitting = ref(false)
+const showPayment = ref(false)
 
 const grouped = computed(() => {
   const groups = {}
@@ -31,11 +33,20 @@ function quantityOf(menuItemId) {
   return cart.items.find((i) => i.menuItemId === menuItemId)?.quantity || 0
 }
 
-async function submitOrder() {
+function startCheckout() {
   if (!auth.isAuthenticated) {
     router.push('/login')
     return
   }
+  showPayment.value = true
+}
+
+async function handlePaid() {
+  showPayment.value = false
+  await submitOrder()
+}
+
+async function submitOrder() {
   error.value = ''
   submitting.value = true
   try {
@@ -145,10 +156,10 @@ onMounted(async () => {
           <p v-if="error" class="text-xs text-accent">{{ error }}</p>
           <button
             :disabled="submitting"
-            @click="submitOrder"
+            @click="startCheckout"
             class="bg-accent px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim disabled:opacity-50"
           >
-            {{ submitting ? 'Placing order...' : 'Confirm order →' }}
+            {{ submitting ? 'Placing order...' : `Checkout · RM ${cart.total.toFixed(2)} →` }}
           </button>
         </div>
       </div>
@@ -157,5 +168,7 @@ onMounted(async () => {
     <router-link v-else to="/" class="fixed bottom-4 left-6 text-xs text-muted hover:text-ink">
       Skip, go home →
     </router-link>
+
+    <PaymentModal v-if="showPayment" :amount="cart.total" @close="showPayment = false" @paid="handlePaid" />
   </main>
 </template>

@@ -30,23 +30,28 @@ function imageFor(itemName) {
 }
 
 async function seed() {
-  await sequelize.sync()
+  await sequelize.sync({ alter: true })
 
   const [hall] = await Hall.findOrCreate({
     where: { name: 'Hall 1' },
     defaults: { rows: ROWS.length, seats_per_row: SEATS_PER_ROW },
   })
 
+  const STANDARD_PRICE = 15.0
+  const PREMIUM_PRICE = 25.0
+
   const existingSeats = await Seat.count({ where: { hall_id: hall.id } })
   if (existingSeats === 0) {
     const seatRows = []
     for (const row of ROWS) {
       for (let n = 1; n <= SEATS_PER_ROW; n++) {
+        const type = row === 'A' ? 'premium' : 'standard'
         seatRows.push({
           hall_id: hall.id,
           seat_row: row,
           seat_number: n,
-          type: row === 'A' ? 'premium' : 'standard',
+          type,
+          price: type === 'premium' ? PREMIUM_PRICE : STANDARD_PRICE,
         })
       }
     }
@@ -55,6 +60,9 @@ async function seed() {
   } else {
     console.log(`${hall.name} already has seats, skipping`)
   }
+
+  await Seat.update({ price: PREMIUM_PRICE }, { where: { hall_id: hall.id, type: 'premium' } })
+  await Seat.update({ price: STANDARD_PRICE }, { where: { hall_id: hall.id, type: 'standard' } })
 
   const OLD_PLACEHOLDER_TITLES = [
     'Dune: Part Three',
