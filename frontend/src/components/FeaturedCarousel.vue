@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
@@ -7,11 +7,14 @@ const props = defineProps({
 })
 const router = useRouter()
 
+// Slide 0 is the "book your seat" hero; movie slides follow after it.
+const slideCount = computed(() => props.movies.length + 1)
+
 const index = ref(0)
 const paused = ref(false)
 // Only the slide the viewer has actually reached gets its (heavy) image
 // requested — otherwise every slide's backdrop would load upfront.
-const loadedSlides = ref(new Set([0, 1]))
+const loadedSlides = ref(new Set([1, 2]))
 let timer = null
 
 const reducedMotion =
@@ -21,24 +24,44 @@ function goTo(i) {
   index.value = i
   loadedSlides.value.add(i)
 }
+
+// Shortest-path offset so slides always slide in from the correct side,
+// including when wrapping around from the last slide back to the first.
+function offsetFor(i) {
+  const total = slideCount.value
+  let d = i - index.value
+  if (d > total / 2) d -= total
+  if (d < -total / 2) d += total
+  return d
+}
 function next() {
-  goTo((index.value + 1) % props.movies.length)
+  goTo((index.value + 1) % slideCount.value)
 }
 function prev() {
-  goTo((index.value - 1 + props.movies.length) % props.movies.length)
+  goTo((index.value - 1 + slideCount.value) % slideCount.value)
+}
+
+function stopAutoplay() {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
 }
 
 function startAutoplay() {
-  if (reducedMotion || props.movies.length <= 1) return
+  stopAutoplay()
+  if (reducedMotion || slideCount.value <= 1) return
   timer = setInterval(() => {
     if (!paused.value) next()
-  }, 5000)
+  }, 3000)
 }
 
+// The carousel mounts before showtimes finish loading (movies starts empty),
+// so re-evaluate autoplay whenever the slide count changes — otherwise the
+// initial "only 1 slide" check would permanently skip it.
+watch(slideCount, startAutoplay)
 onMounted(startAutoplay)
-onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
+onUnmounted(stopAutoplay)
 
 function formatDuration(mins) {
   if (!mins) return null
@@ -54,20 +77,35 @@ function goToDetail(movie) {
 
 <template>
   <div
-    v-if="movies.length > 0"
     class="relative overflow-hidden border-b border-border"
     @mouseenter="paused = true"
     @mouseleave="paused = false"
   >
-    <div class="relative aspect-[16/9] sm:aspect-[3/1]">
+    <div class="relative min-h-[460px] sm:min-h-[500px]">
+      <!-- Slide 0: site hero -->
+      <div
+        class="absolute inset-0 overflow-hidden bg-bg transition-transform duration-700 ease-in-out"
+        :class="index === 0 ? 'z-10' : 'z-0 pointer-events-none'"
+        :style="{ transform: `translateX(${offsetFor(0) * 100}%)` }"
+      >
+        <div
+          class="pointer-events-none absolute left-1/2 top-0 -z-10 h-80 w-80 -translate-x-1/2 -translate-y-1/3 rounded-full bg-accent/10 blur-3xl"
+        />
+        <div class="flex h-full items-center px-6 sm:px-10">
+          <slot name="hero" />
+        </div>
+      </div>
+
+      <!-- Slides 1..N: featured movies -->
       <div
         v-for="(m, i) in movies"
         :key="m.movieTitle"
-        class="absolute inset-0 transition-opacity duration-700"
-        :class="i === index ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'"
+        class="absolute inset-0 transition-transform duration-700 ease-in-out"
+        :class="i + 1 === index ? 'z-10' : 'z-0 pointer-events-none'"
+        :style="{ transform: `translateX(${offsetFor(i + 1) * 100}%)` }"
       >
         <img
-          v-if="loadedSlides.has(i) && (m.backdropUrl || m.posterUrl)"
+          v-if="loadedSlides.has(i + 1) && (m.backdropUrl || m.posterUrl)"
           :src="m.backdropUrl || m.posterUrl"
           :alt="m.movieTitle"
           class="h-full w-full object-cover"
@@ -95,7 +133,7 @@ function goToDetail(movie) {
       </div>
     </div>
 
-    <template v-if="movies.length > 1">
+    <template v-if="slideCount > 1">
       <button
         aria-label="Previous slide"
         class="absolute left-3 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center border border-border bg-bg/70 text-ink backdrop-blur transition-colors hover:border-accent hover:text-accent"
@@ -113,12 +151,12 @@ function goToDetail(movie) {
 
       <div class="absolute bottom-3 right-3 z-20 flex gap-1.5 sm:bottom-4 sm:right-6">
         <button
-          v-for="(m, i) in movies"
-          :key="m.movieTitle"
-          :aria-label="`Go to slide ${i + 1}`"
+          v-for="i in slideCount"
+          :key="i"
+          :aria-label="`Go to slide ${i}`"
           class="h-1.5 w-5 transition-colors"
-          :class="i === index ? 'bg-accent' : 'bg-border hover:bg-accent-dim'"
-          @click="goTo(i)"
+          :class="i - 1 === index ? 'bg-accent' : 'bg-border hover:bg-accent-dim'"
+          @click="goTo(i - 1)"
         />
       </div>
     </template>

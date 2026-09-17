@@ -97,83 +97,62 @@ const steps = [
 
 <template>
   <div>
-    <FeaturedCarousel v-if="!loading" :movies="featuredMovies" />
-
-    <header class="relative overflow-hidden px-6 pt-16 pb-10 sm:pt-20">
-      <div
-        class="pointer-events-none absolute left-1/2 top-0 -z-10 h-80 w-80 -translate-x-1/2 -translate-y-1/3 rounded-full bg-accent/10 blur-3xl"
-      />
-
-      <div class="mx-auto max-w-4xl">
-        <p class="mb-4 flex items-center gap-2 text-xs tracking-[0.14em] text-accent">
-          <span class="relative flex h-2 w-2">
-            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
-            <span class="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-          </span>
-          BOOKING TERMINAL
-        </p>
-        <h1 class="font-display text-[13vw] font-extrabold uppercase leading-[0.9] text-ink sm:text-7xl">
-          Book<br />your<br />seat<span class="blink-cursor text-accent">_</span>
-        </h1>
-
-        <div class="hud-corners mt-10 flex flex-wrap gap-10 border-y border-border py-5">
-          <div class="flex flex-col gap-1 text-xs text-muted">
-            <span class="font-display text-xl font-bold text-ink">{{ loading ? '—' : movieCount }}</span>
-            Movies
-          </div>
-          <div class="flex flex-col gap-1 text-xs text-muted">
-            <span class="font-display text-xl font-bold text-ink">{{ loading ? '—' : sessionCount }}</span>
-            Sessions
-          </div>
-          <div class="flex flex-col gap-1 text-xs text-muted">
-            <span class="font-display text-xl font-bold text-ink">Live</span>
-            Seat lock
-          </div>
-        </div>
-
-        <div class="mt-8 flex flex-wrap gap-3">
-          <router-link
-            to="/showtimes"
-            class="bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim"
-          >
-            Select seats →
-          </router-link>
-          <router-link
-            to="/menu"
-            class="border border-border px-6 py-3 text-xs uppercase tracking-wide text-muted transition-colors hover:border-accent hover:text-accent"
-          >
-            Food &amp; drinks
-          </router-link>
-        </div>
-      </div>
-    </header>
-
-    <section v-if="!auth.isAuthenticated" class="px-6">
-      <div
-        class="hud-corners mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4 border border-accent/40 bg-accent/5 px-6 py-5"
-      >
-        <div>
-          <p class="text-xs tracking-[0.14em] text-accent">KINORA REWARDS</p>
-          <p class="font-display mt-1 text-sm font-bold text-ink sm:text-base">
-            Earn 1 point per RM spent — 100 points = RM 5 off your next booking
+    <FeaturedCarousel :movies="featuredMovies">
+      <template #hero>
+        <div class="mx-auto max-w-4xl">
+          <p class="mb-4 flex items-center gap-2 text-xs tracking-[0.14em] text-accent">
+            <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+            </span>
+            BOOKING TERMINAL
           </p>
+          <h1 class="font-display text-[13vw] font-extrabold uppercase leading-[0.9] text-ink sm:text-7xl">
+            Book<br />your<br />seat<span class="blink-cursor text-accent">_</span>
+          </h1>
+
+          <div class="hud-corners mt-10 flex flex-wrap gap-10 border-y border-border py-5">
+            <div class="flex flex-col gap-1 text-xs text-muted">
+              <span class="font-display text-xl font-bold text-ink">{{ loading ? '—' : movieCount }}</span>
+              Movies
+            </div>
+            <div class="flex flex-col gap-1 text-xs text-muted">
+              <span class="font-display text-xl font-bold text-ink">{{ loading ? '—' : sessionCount }}</span>
+              Sessions
+            </div>
+            <div class="flex flex-col gap-1 text-xs text-muted">
+              <span class="font-display text-xl font-bold text-ink">Live</span>
+              Seat lock
+            </div>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <router-link
+              to="/showtimes"
+              class="bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim"
+            >
+              Select seats →
+            </router-link>
+            <router-link
+              to="/menu"
+              class="border border-border px-6 py-3 text-xs uppercase tracking-wide text-muted transition-colors hover:border-accent hover:text-accent"
+            >
+              Food &amp; drinks
+            </router-link>
+          </div>
         </div>
-        <div class="flex flex-shrink-0 gap-3">
-          <router-link
-            to="/register"
-            class="bg-accent px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim"
-          >
-            Join free →
-          </router-link>
-          <router-link
-            to="/login"
-            class="border border-border px-5 py-2.5 text-xs uppercase tracking-wide text-muted transition-colors hover:border-accent hover:text-accent"
-          >
-            Login
-          </router-link>
-        </div>
-      </div>
-    </section>
+      </template>
+    </FeaturedCarousel>
+
+    <router-link
+      v-if="!auth.isAuthenticated"
+      to="/register"
+      class="flex items-center justify-center gap-2 border-y border-accent/30 bg-accent/5 px-6 py-2 text-center text-xs text-ink transition-colors hover:bg-accent/10"
+    >
+      <span class="text-accent">★</span>
+      Earn points on every booking — 100 pts = RM 5 off
+      <span class="font-bold text-accent">Join free →</span>
+    </router-link>
 
     <section class="mx-auto max-w-4xl px-6 py-10">
       <div class="mb-4 flex items-baseline justify-between border-b border-border pb-3">
