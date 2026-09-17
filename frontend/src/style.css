@@ -11,6 +11,14 @@
   --color-muted: #7d8f8c;
 }
 
+button,
+[role="button"] {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
 body {
   background:
     repeating-linear-gradient(180deg, rgba(45, 212, 191, 0.03) 0px, rgba(45, 212, 191, 0.03) 1px, transparent 1px, transparent 3px),
