@@ -48,10 +48,10 @@ function formatTime(iso) {
     <template v-else>
       <section class="mb-12">
         <h2 class="font-display mb-4 border-b border-border pb-2 text-sm font-bold uppercase tracking-wide text-ink">
-          Seats
+          Your Tickets
         </h2>
         <p v-if="bookings.length === 0" class="text-sm text-muted">
-          No bookings yet.
+          No bookings yet — go find something good to watch!
           <router-link to="/showtimes" class="text-accent hover:text-accent-dim">Browse showtimes →</router-link>
         </p>
         <div v-else class="space-y-3">
@@ -82,10 +82,10 @@ function formatTime(iso) {
 
       <section>
         <h2 class="font-display mb-4 border-b border-border pb-2 text-sm font-bold uppercase tracking-wide text-ink">
-          Orders
+          Your Snacks
         </h2>
         <p v-if="orders.length === 0" class="text-sm text-muted">
-          No orders yet.
+          No snack orders yet.
           <router-link to="/menu" class="text-accent hover:text-accent-dim">Order food &amp; drinks →</router-link>
         </p>
         <div v-else class="space-y-3">

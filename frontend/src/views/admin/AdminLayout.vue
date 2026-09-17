@@ -4,7 +4,7 @@
 <template>
   <div class="min-h-screen">
     <div class="border-b border-border px-6 py-3">
-      <p class="text-xs tracking-[0.14em] text-accent">ADMIN TERMINAL</p>
+      <p class="text-xs tracking-[0.14em] text-accent">ADMIN</p>
     </div>
     <nav class="flex flex-wrap gap-0 border-b border-border text-xs">
       <router-link

@@ -72,7 +72,7 @@ async function handleSubmit() {
       novalidate
       class="hud-corners w-full max-w-sm space-y-4 border border-border p-8"
     >
-      <p class="text-center text-xs tracking-[0.14em] text-accent">NEW ACCOUNT</p>
+      <p class="text-center text-xs tracking-[0.14em] text-accent">JOIN KINORA</p>
       <h1 class="font-display text-center text-2xl font-extrabold uppercase text-ink">Register</h1>
 
       <div>

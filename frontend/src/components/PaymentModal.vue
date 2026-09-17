@@ -91,7 +91,7 @@ async function pay() {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" @click.self="emit('close')">
     <div class="hud-corners w-full max-w-sm border border-border bg-bg p-6">
       <div class="mb-4 flex items-center justify-between">
-        <p class="text-xs tracking-[0.14em] text-accent">MOCK PAYMENT</p>
+        <p class="text-xs tracking-[0.14em] text-accent">DEMO PAYMENT</p>
         <button class="text-muted hover:text-ink" @click="emit('close')">✕</button>
       </div>
 
@@ -101,7 +101,7 @@ async function pay() {
           >RM {{ amount.toFixed(2) }}</span
         >
       </p>
-      <p class="mb-6 text-xs text-muted">Demo checkout — no real payment is processed, no card is charged.</p>
+      <p class="mb-6 text-xs text-muted">Just a demo — no real payment, no card gets charged. Promise!</p>
 
       <div v-if="!auth.isAuthenticated" class="mb-4 space-y-3 border border-border p-3">
         <p class="text-[11px] uppercase tracking-wide text-muted">Booking as guest</p>

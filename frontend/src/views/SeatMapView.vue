@@ -95,9 +95,9 @@ async function confirmBooking({ guestName, guestEmail, redeemPoints } = {}) {
 
     if (auth.isAuthenticated) {
       await auth.refreshUser()
-      toast.success(`✓ Booking confirmed · +${data.pointsEarned} pts`)
+      toast.success(`✓ You're booked! +${data.pointsEarned} pts`)
     } else {
-      toast.success('✓ Booking confirmed')
+      toast.success("✓ You're booked!")
     }
 
     confirmed.value = {
@@ -108,7 +108,7 @@ async function confirmBooking({ guestName, guestEmail, redeemPoints } = {}) {
       isGuest: !auth.isAuthenticated,
     }
   } catch (err) {
-    error.value = err.response?.data?.message || 'Booking failed. The seat may have just been taken — please pick another.'
+    error.value = err.response?.data?.message || 'Oops, someone just grabbed that seat — pick another one.'
     toast.error(error.value)
     await loadSeats()
   } finally {
@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
 <template>
   <main v-if="confirmed" class="flex min-h-screen items-center justify-center px-6 py-16">
     <div class="hud-corners w-full max-w-md border border-border p-6">
-      <p class="mb-2 text-xs tracking-[0.14em] text-accent">✓ BOOKING CONFIRMED</p>
+      <p class="mb-2 text-xs tracking-[0.14em] text-accent">✓ YOU'RE ALL SET</p>
       <h1 class="font-display mb-1 text-2xl font-bold uppercase text-ink">{{ showtime?.movie_title }}</h1>
       <p class="mb-6 text-xs text-muted">{{ showtime?.Hall?.name }}</p>
 
@@ -182,9 +182,9 @@ onBeforeUnmount(() => {
       </div>
 
       <p v-if="confirmed.isGuest" class="mt-4 text-xs text-muted">
-        Booked as a guest — this confirmation is your only record.
+        You booked as a guest, so save this screen — it's your only record.
         <router-link to="/register" class="text-accent hover:text-accent-dim">Create an account</router-link>
-        to save bookings and earn points next time.
+        so we can save your bookings and give you points next time.
       </p>
 
       <div class="mt-6 flex flex-wrap gap-3">
@@ -192,7 +192,7 @@ onBeforeUnmount(() => {
           class="bg-accent px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim"
           @click="goToMenu"
         >
-          Add food &amp; drinks →
+          Add snacks →
         </button>
         <router-link
           to="/"
@@ -224,7 +224,7 @@ onBeforeUnmount(() => {
           />
         </div>
         <div>
-          <p class="text-xs tracking-[0.14em] text-accent">SELECT YOUR SEATS</p>
+          <p class="text-xs tracking-[0.14em] text-accent">PICK YOUR SEATS</p>
           <h1 class="font-display text-2xl font-bold uppercase text-ink">{{ showtime.movie_title }}</h1>
           <p class="text-xs text-muted">{{ showtime.Hall?.name }}</p>
         </div>

@@ -8,12 +8,12 @@ const year = new Date().getFullYear()
       <div>
         <p class="font-display text-base font-extrabold tracking-wide text-ink">KINORA</p>
         <p class="mt-1 max-w-xs text-xs text-muted">
-          Book seats, lock them in live, order concessions — all from one terminal.
+          Pick a movie, grab your seats, and treat yourself to some snacks.
         </p>
       </div>
 
       <div class="flex flex-col gap-2 text-xs">
-        <p class="text-muted">Navigate</p>
+        <p class="text-muted">Explore</p>
         <router-link to="/showtimes" class="text-ink transition-colors hover:text-accent">Showtimes</router-link>
         <router-link to="/menu" class="text-ink transition-colors hover:text-accent">Food &amp; Drinks</router-link>
       </div>
@@ -28,7 +28,7 @@ const year = new Date().getFullYear()
           <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
           <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
         </span>
-        SYSTEM ONLINE
+        WE'RE ONLINE
       </span>
     </div>
   </footer>

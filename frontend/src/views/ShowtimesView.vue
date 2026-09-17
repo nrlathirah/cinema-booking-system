@@ -37,7 +37,7 @@ const movies = computed(() => {
 
 <template>
   <main class="mx-auto min-h-screen max-w-5xl px-6 py-12">
-    <p class="mb-2 text-xs tracking-[0.14em] text-accent">BOOKING TERMINAL</p>
+    <p class="mb-2 text-xs tracking-[0.14em] text-accent">WHAT'S ON</p>
     <h1 class="font-display mb-8 text-3xl font-extrabold uppercase text-ink">Showtimes</h1>
 
     <div v-if="loading" class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">

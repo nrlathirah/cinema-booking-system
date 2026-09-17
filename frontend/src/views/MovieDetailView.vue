@@ -53,7 +53,7 @@ function formatDuration(mins) {
   <main class="min-h-screen">
     <p v-if="loading" class="px-6 py-12 text-sm text-muted">Loading...</p>
     <p v-else-if="!movie" class="px-6 py-12 text-sm text-muted">
-      Movie not found.
+      Can't find that movie.
       <router-link to="/showtimes" class="text-accent hover:text-accent-dim">Back to showtimes →</router-link>
     </p>
 
@@ -90,7 +90,7 @@ function formatDuration(mins) {
           {{ movie.overview }}
         </p>
 
-        <p class="mb-6 text-xs tracking-[0.14em] text-accent">SELECT A SHOWTIME</p>
+        <p class="mb-6 text-xs tracking-[0.14em] text-accent">PICK A TIME</p>
 
         <div v-for="[date, daySessions] in sessionsByDate" :key="date" class="mb-8">
           <p class="font-display mb-3 text-sm font-bold uppercase text-ink">{{ date }}</p>

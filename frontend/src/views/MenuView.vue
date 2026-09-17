@@ -59,9 +59,9 @@ async function submitOrder({ guestName, guestEmail, redeemPoints } = {}) {
 
     if (auth.isAuthenticated) {
       await auth.refreshUser()
-      toast.success(`✓ Order placed · +${data.pointsEarned} pts`)
+      toast.success(`✓ Order sent! +${data.pointsEarned} pts`)
     } else {
-      toast.success('✓ Order placed — see you at the movies')
+      toast.success('✓ Order sent — enjoy the show!')
     }
     router.push('/')
   } catch (err) {
@@ -88,12 +88,12 @@ onMounted(async () => {
 <template>
   <main class="min-h-screen px-6 py-8 pb-32">
     <div class="mx-auto max-w-4xl">
-      <p class="mb-2 text-xs tracking-[0.14em] text-accent">CONCESSIONS MANIFEST</p>
-      <h1 class="font-display mb-1 text-3xl font-extrabold uppercase text-ink">Food &amp; Beverages</h1>
+      <p class="mb-2 text-xs tracking-[0.14em] text-accent">SNACK TIME</p>
+      <h1 class="font-display mb-1 text-3xl font-extrabold uppercase text-ink">Food &amp; Drinks</h1>
       <p v-if="bookingId" class="mb-8 text-xs text-accent">
-        Bundling with your <template v-if="movieTitle">{{ movieTitle }} </template>booking
+        Adding this to your <template v-if="movieTitle">{{ movieTitle }} </template>booking
       </p>
-      <p v-else class="mb-8 text-xs text-muted">Order F&amp;B on its own</p>
+      <p v-else class="mb-8 text-xs text-muted">Just here for snacks? Go ahead.</p>
 
       <p v-if="loading" class="text-sm text-muted">Loading menu...</p>
       <p v-else-if="loadError" class="text-sm text-red-400">{{ loadError }}</p>

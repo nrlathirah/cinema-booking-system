@@ -89,9 +89,9 @@ function formatReleaseDate(iso) {
 }
 
 const steps = [
-  { n: '01', title: 'Pick a showtime', body: "Browse what's playing and choose your session." },
-  { n: '02', title: 'Lock your seat', body: 'Selected live over a socket — nobody else can grab it while you decide.' },
-  { n: '03', title: 'Add concessions', body: 'Bundle popcorn & drinks with your booking, or order on their own.' },
+  { n: '01', title: 'Pick a showtime', body: "Browse what's playing and choose a time that works for you." },
+  { n: '02', title: 'Grab your seat', body: "We hold it for you in real time — nobody else can snatch it while you decide." },
+  { n: '03', title: 'Add some snacks', body: 'Popcorn, drinks, whatever you like — add them to your order or get them on their own.' },
 ]
 </script>
 
@@ -105,7 +105,7 @@ const steps = [
               <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
               <span class="relative inline-flex h-2 w-2 rounded-full bg-accent" />
             </span>
-            BOOKING TERMINAL
+            NOW BOOKING
           </p>
           <h1 class="font-display text-[13vw] font-extrabold uppercase leading-[0.9] text-ink sm:text-7xl">
             Book<br />your<br />seat<span class="blink-cursor text-accent">_</span>
@@ -118,7 +118,7 @@ const steps = [
             </div>
             <div class="flex flex-col gap-1 text-xs text-muted">
               <span class="font-display text-xl font-bold text-ink">{{ loading ? '—' : sessionCount }}</span>
-              Sessions
+              Showtimes
             </div>
             <div class="flex flex-col gap-1 text-xs text-muted">
               <span class="font-display text-xl font-bold text-ink">Live</span>
@@ -131,7 +131,7 @@ const steps = [
               to="/showtimes"
               class="bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim"
             >
-              Select seats →
+              Grab a seat →
             </router-link>
             <router-link
               to="/menu"
@@ -243,7 +243,7 @@ const steps = [
 
         <div v-if="!loading && menuItems.length > 0">
           <div class="mb-6 flex items-baseline justify-between">
-            <p class="text-xs tracking-[0.14em] text-accent">CONCESSIONS</p>
+            <p class="text-xs tracking-[0.14em] text-accent">SNACKS</p>
             <router-link to="/menu" class="text-xs text-accent hover:text-accent-dim">Order now →</router-link>
           </div>
           <div class="grid grid-cols-2 gap-4">
