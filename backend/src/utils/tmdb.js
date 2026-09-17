@@ -15,20 +15,74 @@ export async function fetchMovieFromTMDB(title) {
     const match = searchData.results?.[0]
     if (!match) return null
 
-    const detailsRes = await fetch(`${TMDB_BASE}/movie/${match.id}?api_key=${apiKey}`)
+    const detailsRes = await fetch(
+      `${TMDB_BASE}/movie/${match.id}?api_key=${apiKey}&append_to_response=release_dates`,
+    )
     const details = detailsRes.ok ? await detailsRes.json() : {}
 
     return {
+      tmdbId: match.id,
       posterUrl: match.poster_path ? `${TMDB_POSTER_BASE}${match.poster_path}` : null,
       backdropUrl: match.backdrop_path ? `${TMDB_BACKDROP_BASE}${match.backdrop_path}` : null,
       durationMinutes: details.runtime || null,
       genre: details.genres?.[0]?.name || null,
       overview: match.overview || null,
       rating: match.vote_average ? Math.round(match.vote_average * 10) / 10 : null,
+      tagline: details.tagline || null,
+      releaseDate: details.release_date || null,
+      ageRating: extractAgeRating(details.release_dates?.results),
     }
   } catch (err) {
     console.warn(`TMDB lookup failed for "${title}":`, err.message)
     return null
+  }
+}
+
+function extractAgeRating(releaseDateResults) {
+  if (!releaseDateResults) return null
+  for (const countryCode of ['MY', 'US', 'GB']) {
+    const entry = releaseDateResults.find((r) => r.iso_3166_1 === countryCode)
+    const certification = entry?.release_dates?.find((d) => d.certification)?.certification
+    if (certification) return certification
+  }
+  return null
+}
+
+let extrasCache = new Map()
+const EXTRAS_TTL_MS = 24 * 60 * 60 * 1000
+
+export async function fetchMovieExtras(tmdbId) {
+  const apiKey = process.env.TMDB_API_KEY
+  if (!apiKey || !tmdbId) return { trailerKey: null, cast: [] }
+
+  const cached = extrasCache.get(tmdbId)
+  if (cached && Date.now() - cached.fetchedAt < EXTRAS_TTL_MS) {
+    return cached.data
+  }
+
+  try {
+    const res = await fetch(
+      `${TMDB_BASE}/movie/${tmdbId}?api_key=${apiKey}&append_to_response=credits,videos`,
+    )
+    if (!res.ok) return { trailerKey: null, cast: [] }
+    const data = await res.json()
+
+    const trailer = data.videos?.results?.find(
+      (v) => v.site === 'YouTube' && v.type === 'Trailer' && v.official,
+    ) || data.videos?.results?.find((v) => v.site === 'YouTube' && v.type === 'Trailer')
+
+    const cast = (data.credits?.cast || []).slice(0, 6).map((c) => ({
+      name: c.name,
+      character: c.character || null,
+      photoUrl: c.profile_path ? `https://image.tmdb.org/t/p/w185${c.profile_path}` : null,
+    }))
+
+    const result = { trailerKey: trailer?.key || null, cast }
+    extrasCache.set(tmdbId, { data: result, fetchedAt: Date.now() })
+    return result
+  } catch (err) {
+    console.warn(`TMDB extras lookup failed for id ${tmdbId}:`, err.message)
+    return { trailerKey: null, cast: [] }
   }
 }
 
