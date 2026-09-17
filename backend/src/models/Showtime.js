@@ -11,6 +11,7 @@ Showtime.init(
     backdrop_url: { type: DataTypes.STRING, allowNull: true },
     genre: { type: DataTypes.STRING, allowNull: true },
     overview: { type: DataTypes.TEXT, allowNull: true },
+    rating: { type: DataTypes.DECIMAL(3, 1), allowNull: true },
     duration_minutes: { type: DataTypes.INTEGER, allowNull: true },
     start_time: { type: DataTypes.DATE, allowNull: false },
     end_time: { type: DataTypes.DATE, allowNull: false },

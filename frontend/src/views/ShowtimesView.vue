@@ -25,6 +25,7 @@ const movies = computed(() => {
         posterUrl: s.poster_url,
         genre: s.genre,
         durationMinutes: s.duration_minutes,
+        rating: s.rating,
         sessions: [],
       })
     }

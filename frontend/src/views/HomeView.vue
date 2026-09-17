@@ -1,19 +1,28 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import api from '../services/api'
+import { useAuthStore } from '../stores/auth'
 import MovieCard from '../components/MovieCard.vue'
 import SkeletonCard from '../components/SkeletonCard.vue'
 import FeaturedCarousel from '../components/FeaturedCarousel.vue'
 
+const auth = useAuthStore()
+
 const showtimes = ref([])
 const menuItems = ref([])
+const comingSoon = ref([])
 const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const [showtimesRes, menuRes] = await Promise.all([api.get('/showtimes'), api.get('/menu')])
+    const [showtimesRes, menuRes, comingSoonRes] = await Promise.all([
+      api.get('/showtimes'),
+      api.get('/menu'),
+      api.get('/movies/coming-soon').catch(() => ({ data: { movies: [] } })),
+    ])
     showtimes.value = showtimesRes.data.showtimes
     menuItems.value = menuRes.data.items.slice(0, 4)
+    comingSoon.value = comingSoonRes.data.movies
   } finally {
     loading.value = false
   }
@@ -29,6 +38,7 @@ const movies = computed(() => {
         backdropUrl: s.backdrop_url,
         genre: s.genre,
         durationMinutes: s.duration_minutes,
+        rating: s.rating,
         sessions: [],
       })
     }
@@ -46,6 +56,37 @@ const nowShowingMovies = computed(() => {
 })
 const movieCount = computed(() => movies.value.length)
 const sessionCount = computed(() => showtimes.value.length)
+
+const searchQuery = ref('')
+const selectedGenre = ref('')
+
+const genres = computed(() => [...new Set(movies.value.map((m) => m.genre).filter(Boolean))].sort())
+
+const isFiltering = computed(() => searchQuery.value.trim() !== '' || selectedGenre.value !== '')
+
+const filteredMovies = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  return movies.value.filter((m) => {
+    const matchesSearch = !q || m.movieTitle.toLowerCase().includes(q)
+    const matchesGenre = !selectedGenre.value || m.genre === selectedGenre.value
+    return matchesSearch && matchesGenre
+  })
+})
+
+const displayedMovies = computed(() => (isFiltering.value ? filteredMovies.value : nowShowingMovies.value))
+
+function toggleGenre(g) {
+  selectedGenre.value = selectedGenre.value === g ? '' : g
+}
+function clearFilters() {
+  searchQuery.value = ''
+  selectedGenre.value = ''
+}
+
+function formatReleaseDate(iso) {
+  if (!iso) return null
+  return new Date(iso).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })
+}
 
 const steps = [
   { n: '01', title: 'Pick a showtime', body: "Browse what's playing and choose your session." },
@@ -107,18 +148,106 @@ const steps = [
       </div>
     </header>
 
+    <section v-if="!auth.isAuthenticated" class="px-6">
+      <div
+        class="hud-corners mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4 border border-accent/40 bg-accent/5 px-6 py-5"
+      >
+        <div>
+          <p class="text-xs tracking-[0.14em] text-accent">KINORA REWARDS</p>
+          <p class="font-display mt-1 text-sm font-bold text-ink sm:text-base">
+            Earn 1 point per RM spent — 100 points = RM 5 off your next booking
+          </p>
+        </div>
+        <div class="flex flex-shrink-0 gap-3">
+          <router-link
+            to="/register"
+            class="bg-accent px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-bg transition-colors hover:bg-accent-dim"
+          >
+            Join free →
+          </router-link>
+          <router-link
+            to="/login"
+            class="border border-border px-5 py-2.5 text-xs uppercase tracking-wide text-muted transition-colors hover:border-accent hover:text-accent"
+          >
+            Login
+          </router-link>
+        </div>
+      </div>
+    </section>
+
     <section class="mx-auto max-w-4xl px-6 py-10">
-      <div class="mb-1 flex items-baseline justify-between border-b border-border pb-3">
+      <div class="mb-4 flex items-baseline justify-between border-b border-border pb-3">
         <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink">Now Showing</h2>
         <router-link to="/showtimes" class="text-xs text-accent hover:text-accent-dim">See all →</router-link>
       </div>
+
+      <div v-if="!loading" class="mb-6 space-y-3">
+        <input
+          v-model="searchQuery"
+          type="search"
+          placeholder="Search movies..."
+          class="w-full border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none sm:max-w-xs"
+        />
+        <div v-if="genres.length > 0" class="flex flex-wrap gap-2">
+          <button
+            v-for="g in genres"
+            :key="g"
+            @click="toggleGenre(g)"
+            class="border px-3 py-1 text-[11px] uppercase tracking-wide transition-colors"
+            :class="
+              selectedGenre === g
+                ? 'border-accent bg-accent text-bg font-bold'
+                : 'border-border text-muted hover:border-accent hover:text-accent'
+            "
+          >
+            {{ g }}
+          </button>
+          <button
+            v-if="isFiltering"
+            @click="clearFilters"
+            class="px-3 py-1 text-[11px] uppercase tracking-wide text-muted hover:text-ink"
+          >
+            Clear ✕
+          </button>
+        </div>
+      </div>
+
       <div v-if="loading" class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4">
         <SkeletonCard v-for="n in 4" :key="n" />
       </div>
-      <div v-else-if="movies.length > 0" class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4">
-        <MovieCard v-for="m in nowShowingMovies" :key="m.movieTitle" :movie="m" />
+      <div v-else-if="displayedMovies.length > 0" class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4">
+        <MovieCard v-for="m in displayedMovies" :key="m.movieTitle" :movie="m" />
       </div>
+      <p v-else-if="isFiltering" class="py-6 text-sm text-muted">No movies match your search.</p>
       <p v-else class="py-6 text-sm text-muted">No showtimes yet. Check back soon.</p>
+    </section>
+
+    <section v-if="!loading && comingSoon.length > 0" class="border-t border-border px-6 py-10">
+      <div class="mx-auto max-w-4xl">
+        <div class="mb-6 border-b border-border pb-3">
+          <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink">Coming Soon</h2>
+        </div>
+        <div class="flex gap-5 overflow-x-auto pb-2">
+          <div v-for="m in comingSoon" :key="m.title" class="w-32 flex-shrink-0 sm:w-36">
+            <div class="relative aspect-[2/3] overflow-hidden border border-border bg-white/5">
+              <img
+                v-if="m.posterUrl"
+                :src="m.posterUrl"
+                :alt="m.title"
+                class="h-full w-full object-cover"
+                loading="lazy"
+              />
+              <span
+                class="absolute left-1.5 top-1.5 bg-bg/85 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-muted backdrop-blur"
+              >
+                Soon
+              </span>
+            </div>
+            <p class="font-display mt-2 truncate text-xs font-bold text-ink">{{ m.title }}</p>
+            <p v-if="m.releaseDate" class="text-[11px] text-muted">{{ formatReleaseDate(m.releaseDate) }}</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="border-t border-border px-6 py-14">

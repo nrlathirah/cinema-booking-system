@@ -27,6 +27,12 @@ function formatDuration(mins) {
       <div v-else class="font-display flex h-full w-full items-center justify-center text-2xl text-muted">
         {{ movie.movieTitle.slice(0, 2).toUpperCase() }}
       </div>
+      <span
+        v-if="movie.rating"
+        class="font-display absolute left-1.5 top-1.5 flex items-center gap-1 bg-bg/85 px-1.5 py-0.5 text-[11px] font-bold text-accent backdrop-blur"
+      >
+        ★ {{ Number(movie.rating).toFixed(1) }}
+      </span>
       <div
         class="pointer-events-none absolute inset-0 border border-accent opacity-0 transition-opacity group-hover:opacity-100"
       />

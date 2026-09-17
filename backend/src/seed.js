@@ -129,10 +129,11 @@ async function seed() {
     const genre = tmdbData?.genre || movie.genre
     const duration = tmdbData?.durationMinutes || movie.duration
     const overview = tmdbData?.overview || null
+    const rating = tmdbData?.rating || null
 
     // Refresh metadata on any sessions already seeded for this movie.
     await Showtime.update(
-      { poster_url: posterUrl, backdrop_url: backdropUrl, genre, duration_minutes: duration, overview },
+      { poster_url: posterUrl, backdrop_url: backdropUrl, genre, duration_minutes: duration, overview, rating },
       { where: { movie_title: movie.title } },
     )
 
@@ -153,6 +154,7 @@ async function seed() {
           backdrop_url: backdropUrl,
           genre,
           overview,
+          rating,
           duration_minutes: duration,
           start_time: start,
           end_time: end,

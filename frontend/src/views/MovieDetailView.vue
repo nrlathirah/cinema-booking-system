@@ -76,7 +76,8 @@ function formatDuration(mins) {
           <h1 class="font-display max-w-2xl text-3xl font-extrabold uppercase leading-none text-ink sm:text-5xl">
             {{ movie.movie_title }}
           </h1>
-          <p v-if="movie.genre || movie.duration_minutes" class="mt-3 text-xs text-muted">
+          <p v-if="movie.genre || movie.duration_minutes || movie.rating" class="mt-3 flex items-center gap-2 text-xs text-muted">
+            <span v-if="movie.rating" class="font-display font-bold text-accent">★ {{ Number(movie.rating).toFixed(1) }}</span>
             <span v-if="movie.genre">{{ movie.genre }}</span>
             <span v-if="movie.genre && movie.duration_minutes"> · </span>
             <span v-if="movie.duration_minutes">{{ formatDuration(movie.duration_minutes) }}</span>
