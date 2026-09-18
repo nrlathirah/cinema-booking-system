@@ -202,6 +202,19 @@ async function seed() {
     console.log(`backfilled poster_url for ${showtimesMissingPoster.length} showtime(s)`)
   }
 
+  // Real photos (Wikimedia Commons, CC-licensed, no API key needed) for the
+  // fixed starter menu — picsum placeholders below are only a fallback for
+  // items an admin adds later that aren't in this list.
+  const MENU_ITEM_IMAGES = {
+    'Popcorn (Salted)': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Popcorn.jpg',
+    'Popcorn (Caramel)': 'https://upload.wikimedia.org/wikipedia/commons/9/9b/Caramel_Popcorn_%2832402585090%29.jpg',
+    'Coca-Cola': 'https://upload.wikimedia.org/wikipedia/commons/7/72/16_fl_oz_Coca-Cola_bottle.jpg',
+    'Mineral Water': 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Bottled_water.jpg',
+    'Nachos with Cheese': 'https://upload.wikimedia.org/wikipedia/commons/8/87/Nachos-cheese.jpg',
+    'Popcorn + Drink Combo':
+      'https://upload.wikimedia.org/wikipedia/commons/8/83/Lahaina%2C_Maui%2C_Hawaii_%28June_2019%29_-_popcorn_and_drink.jpg',
+  }
+
   const existingMenuItems = await MenuItem.count()
   if (existingMenuItems === 0) {
     const menuItems = [
@@ -212,10 +225,18 @@ async function seed() {
       { name: 'Nachos with Cheese', category: 'snacks', price: 15.9, is_combo: false },
       { name: 'Popcorn + Drink Combo', category: 'combo', price: 18.9, is_combo: true },
     ]
-    await MenuItem.bulkCreate(menuItems.map((item) => ({ ...item, image_url: imageFor(item.name) })))
+    await MenuItem.bulkCreate(
+      menuItems.map((item) => ({ ...item, image_url: MENU_ITEM_IMAGES[item.name] || imageFor(item.name) })),
+    )
     console.log('seeded 6 menu items')
   } else {
     console.log('menu items already exist, skipping')
+  }
+
+  // Re-point known items at their real photo every run, in case they were
+  // seeded before these were added (still just placeholder picsum images).
+  for (const [name, url] of Object.entries(MENU_ITEM_IMAGES)) {
+    await MenuItem.update({ image_url: url }, { where: { name } })
   }
 
   const menuItemsMissingImage = await MenuItem.findAll({ where: { image_url: null } })
